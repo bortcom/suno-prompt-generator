@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Конструктор промтов Suno v6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0; --surface:#ffffff; --surface-2:#f2f0eb; --surface-3:#e9e6df; --line:#e2ded5; --line-2:#d3cec3;
+  --ink:#16171c; --ink-2:#464953; --ink-3:#7d808b; --accent:#e0461f; --accent-2:#ff7a45; --accent-ink:#ffffff;
+  --accent-soft:rgba(224,70,31,.10); --code:#faf9f6; --shadow:0 1px 2px rgba(20,20,30,.05),0 8px 24px rgba(20,20,30,.05);
+  --l1:#1d8650; --l1-bg:rgba(29,134,80,.11); --l2:#2a62c6; --l2-bg:rgba(42,98,198,.10);
+  --l3:#a46a00; --l3-bg:rgba(196,132,0,.14); --l4:#c3372e; --l4-bg:rgba(195,55,46,.11);
+  --ok:#1d8650; --warn:#a46a00; --err:#c3372e;
+  --f-ui:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --f-disp:"Unbounded","Inter",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d0e13; --surface:#151720; --surface-2:#1b1e29; --surface-3:#242838; --line:#272b3a; --line-2:#363b4f;
+    --ink:#f0f1f5; --ink-2:#b8bccb; --ink-3:#7c8195; --accent:#ff5a36; --accent-2:#ff8a4c; --accent-ink:#140a06;
+    --accent-soft:rgba(255,90,54,.14); --code:#10121a; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.25);
+    --l1:#56d394; --l1-bg:rgba(86,211,148,.13); --l2:#78adff; --l2-bg:rgba(120,173,255,.13);
+    --l3:#f2b84b; --l3-bg:rgba(242,184,75,.14); --l4:#ff7a72; --l4-bg:rgba(255,122,114,.14);
+    --ok:#56d394; --warn:#f2b84b; --err:#ff7a72;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d0e13; --surface:#151720; --surface-2:#1b1e29; --surface-3:#242838; --line:#272b3a; --line-2:#363b4f;
+  --ink:#f0f1f5; --ink-2:#b8bccb; --ink-3:#7c8195; --accent:#ff5a36; --accent-2:#ff8a4c; --accent-ink:#140a06;
+  --accent-soft:rgba(255,90,54,.14); --code:#10121a; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.25);
+  --l1:#56d394; --l1-bg:rgba(86,211,148,.13); --l2:#78adff; --l2-bg:rgba(120,173,255,.13);
+  --l3:#f2b84b; --l3-bg:rgba(242,184,75,.14); --l4:#ff7a72; --l4-bg:rgba(255,122,114,.14);
+  --ok:#56d394; --warn:#f2b84b; --err:#ff7a72;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-ui);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{max-width:1480px;margin:0 auto;padding:18px 24px 90px}
+
+/* HEADER */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:6px 0 18px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:grid;place-items:center;color:#fff;box-shadow:0 6px 18px rgba(224,70,31,.35);flex:0 0 auto}
+.brand h1{font-family:var(--f-disp);font-weight:600;font-size:22px;letter-spacing:-.01em;margin:0;line-height:1.15}
+.brand .sub{font-size:12.5px;color:var(--ink-3);margin-top:3px}
+.top-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.stepper{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px}
+.stepper a{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500}
+.stepper a:hover{background:var(--surface-2);color:var(--ink)}
+.stepper a i{font-style:normal;font-family:var(--f-disp);font-size:11px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--surface-3);color:var(--ink-2)}
+.icon-btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:13px;font-weight:500}
+.icon-btn:hover{color:var(--ink);border-color:var(--line-2)}
+.icon-btn svg{width:16px;height:16px}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 470px;gap:22px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 22px 24px;margin-bottom:18px;box-shadow:var(--shadow);scroll-margin-top:14px}
+.ph{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.ph .num{font-family:var(--f-disp);font-size:14px;font-weight:600;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);flex:0 0 auto}
+.ph h2{font-family:var(--f-disp);font-weight:600;font-size:19px;margin:2px 0 3px;letter-spacing:-.01em}
+.ph p{margin:0;color:var(--ink-3);font-size:13.5px;max-width:720px}
+.sub-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:20px 0 10px}
+.sub-h h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin:0;font-weight:600}
+.sub-h .cnt{font-size:12px;color:var(--ink-3)}
+.sub-h .cnt b{color:var(--ink)}
+.note{font-size:12.5px;color:var(--ink-3);margin:8px 0 0}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);
+  border-radius:999px;padding:6px 12px;font-size:13px;line-height:1.3;transition:background .15s,border-color .15s,color .15s}
+.chip:hover{border-color:var(--line-2);color:var(--ink)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--ink);font-weight:500}
+.chip .en{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.chip .base{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:0 0 auto}
+.chip .lvd{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.chip.locked{opacity:.75;cursor:default;border-style:dashed}
+.lvd.l1{background:var(--l1)}.lvd.l2{background:var(--l2)}.lvd.l3{background:var(--l3)}.lvd.l4{background:var(--l4)}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:5px 11px;border-radius:7px;font-size:12.5px;color:var(--ink-2)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
+.switch{display:inline-flex;align-items:center;gap:9px;font-size:13px;color:var(--ink-2);cursor:pointer;user-select:none}
+.switch input{appearance:none;width:34px;height:20px;border-radius:999px;background:var(--surface-3);position:relative;margin:0;cursor:pointer;transition:background .15s;flex:0 0 auto}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{left:17px}
+select.sel,input.inp{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:13px;color:var(--ink)}
+input.inp{width:100%}
+input.inp::placeholder{color:var(--ink-3)}
+
+/* GENRES */
+.gtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.gtabs button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--ink-2)}
+.gtabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:9px}
+.gcard{position:relative;text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:14px;padding:12px 12px 11px;transition:transform .12s,border-color .15s,background .15s}
+.gcard:hover{border-color:var(--line-2);transform:translateY(-1px)}
+.gcard .gn{font-weight:600;font-size:14px;line-height:1.25;color:var(--ink);padding-right:26px}
+.gcard .ge{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcard .gm{display:flex;align-items:center;justify-content:space-between;margin-top:9px;font-size:11px;color:var(--ink-3)}
+.ebar{display:flex;gap:2px;align-items:flex-end}
+.ebar span{width:4px;border-radius:2px;background:var(--surface-3)}
+.ebar span.on{background:var(--accent)}
+.gcard .bdg{position:absolute;top:9px;right:9px;font-family:var(--f-disp);font-size:11px;font-weight:600;width:22px;height:22px;border-radius:7px;display:none;place-items:center}
+.gcard.s1{border-color:var(--accent);background:linear-gradient(160deg,var(--accent-soft),transparent 70%),var(--surface-2)}
+.gcard.s1 .bdg{display:grid;background:var(--accent);color:#fff}
+.gcard.s2{border-color:var(--l2)}
+.gcard.s2 .bdg{display:grid;background:var(--l2);color:#fff}
+.gcard .wild{font-size:10px;font-weight:600;color:var(--l3);text-transform:uppercase;letter-spacing:.05em}
+.selbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;padding:11px 14px;border-radius:13px;background:var(--surface-2);border:1px dashed var(--line-2);font-size:13px;color:var(--ink-2)}
+.selbar b{color:var(--ink)}
+.selbar .pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-weight:600;font-size:12.5px}
+.pill.p1{background:var(--accent);color:#fff}
+.pill.p2{background:var(--l2);color:#fff}
+.selbar .sp{flex:1}
+.mini{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 9px;font-size:12px;color:var(--ink-2);display:inline-flex;align-items:center;gap:5px}
+.mini:hover{color:var(--ink);border-color:var(--line-2)}
+.mini svg{width:13px;height:13px}
+.tempo{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+.tempo .bpm{font-family:var(--f-disp);font-size:24px;font-weight:600;min-width:94px}
+.tempo .bpm small{font-family:var(--f-ui);font-size:12px;color:var(--ink-3);font-weight:500}
+.range-wrap{position:relative;height:30px}
+.range-wrap .zone{position:absolute;top:11px;height:8px;border-radius:4px;background:var(--accent-soft);border:1px solid var(--accent)}
+.range-wrap .zone2{position:absolute;top:11px;height:8px;border-radius:4px;border:1px dashed var(--l2)}
+input[type=range]{position:relative;width:100%;margin:0;height:30px;background:transparent;-webkit-appearance:none;appearance:none}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--surface-3)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);margin-top:-8px;border:3px solid var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--surface-3)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);border:3px solid var(--surface)}
+.trow{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:10px}
+
+/* STRUCTURE */
+.tpls{display:flex;gap:7px;flex-wrap:wrap}
+.palette{display:flex;gap:6px;flex-wrap:wrap}
+.pal{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:5px 10px 5px 8px;font-size:12.5px;color:var(--ink-2)}
+.pal:hover{border-color:var(--c);color:var(--ink)}
+.pal i{width:9px;height:9px;border-radius:3px;background:var(--c)}
+.pal svg{width:12px;height:12px;opacity:.6}
+.arr{margin:16px 0 6px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:6px 10px 10px}
+.arr-scroll{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;padding-top:24px;margin-top:-20px}
+.arr-inner{position:relative;width:max-content;min-width:100%}
+.ruler{position:relative;height:18px;font-family:var(--f-mono);font-size:10px;color:var(--ink-3);user-select:none}
+.ruler i{position:absolute;top:2px;height:14px;border-left:1px solid var(--line-2);padding-left:4px;font-style:normal;line-height:12px;white-space:nowrap}
+.timeline{display:flex;height:62px;margin-top:2px}
+.tl{position:relative;flex:0 0 auto;height:100%;padding:0 1.5px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;outline:none}
+.tlb{position:relative;height:100%;background:var(--c);color:#fff;border-radius:8px;padding:7px 12px 6px 8px;overflow:hidden;transition:filter .15s,box-shadow .15s}
+.tl:hover .tlb{filter:brightness(1.08)}
+.tl:focus-visible .tlb{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--accent)}
+.tl.focus .tlb{box-shadow:inset 0 0 0 2px rgba(255,255,255,.85)}
+.tln{display:block;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}
+.tlb small{display:block;font-size:10px;font-weight:500;opacity:.88;white-space:nowrap;overflow:hidden;margin-top:2px}
+.tlb .vx{position:absolute;left:8px;bottom:7px;width:6px;height:6px;border-radius:50%;background:#fff;opacity:.9}
+.tl.end{cursor:pointer}
+.tl.end .tlb{display:grid;place-items:center;padding:0;font-size:10px}
+.tl.dragging .tlb{opacity:.3;background:transparent;outline:2px dashed var(--c);outline-offset:-2px}
+.rz{position:absolute;top:0;right:-4px;width:15px;height:100%;cursor:ew-resize;touch-action:none;z-index:2;display:flex;align-items:center;justify-content:center}
+.rz::after{content:"";width:3px;height:22px;border-radius:2px;background:rgba(255,255,255,.55);box-shadow:0 0 0 1px rgba(0,0,0,.08);transition:background .15s,height .15s}
+.tl:hover .rz::after,.tl.resizing .rz::after{background:#fff;height:32px}
+.rz-tip{position:absolute;top:-28px;right:-8px;background:var(--ink);color:var(--bg);font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:5}
+.ghost{position:fixed;z-index:80;pointer-events:none;margin:0}
+.tl.ghost .tlb{box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.scard.ghost{box-shadow:0 18px 44px rgba(0,0,0,.28);opacity:.96;transform:rotate(-.4deg)}
+body.rzing,body.rzing *{cursor:ew-resize !important}
+body.dnd,body.dnd *{cursor:grabbing !important;user-select:none !important}
+.tl-hint{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-3);margin-top:8px}
+.tl-hint kbd{font-family:var(--f-mono);font-size:10.5px;background:var(--surface);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;color:var(--ink-2)}
+.lenstep{display:inline-flex;align-items:center;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.lenstep button{border:0;background:transparent;width:38px;height:34px;font-size:18px;line-height:1;color:var(--ink-2)}
+.lenstep button:hover{background:var(--surface-3);color:var(--ink)}
+.lenstep b{min-width:92px;text-align:center;font-size:13px}
+.lenstep span{font-size:12px;color:var(--ink-3);padding-right:12px}
+.tl-meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink-3)}
+.tl-meta b{color:var(--ink)}
+.cards{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.scard{border:1px solid var(--line);border-left:4px solid var(--c);border-radius:13px;background:var(--surface-2);transition:box-shadow .15s,opacity .15s}
+.scard.drag{opacity:.35}
+.scard.open{background:var(--surface);box-shadow:var(--shadow)}
+.sc-h{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 10px 9px 6px;cursor:grab;user-select:none}
+.sc-h .sc-act,.sc-h .sc-act button{cursor:pointer}
+.grip{border:0;background:transparent;color:var(--ink-3);padding:4px;cursor:grab;display:grid;place-items:center;border-radius:6px}
+.grip:active{cursor:grabbing}
+.grip svg{width:16px;height:16px}
+.sc-name{display:flex;flex-direction:column;min-width:96px}
+.sc-name b{font-size:14px}
+.sc-name span{font-size:11.5px;color:var(--ink-3)}
+.sc-tag{font-family:var(--f-mono);font-size:12px;line-height:1.5;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sc-act{display:flex;gap:2px}
+.sc-act button{border:0;background:transparent;color:var(--ink-3);width:30px;height:30px;border-radius:8px;display:grid;place-items:center}
+.sc-act button:hover{background:var(--surface-3);color:var(--ink)}
+.sc-act button.del:hover{color:var(--err)}
+.sc-act svg{width:15px;height:15px}
+.sc-act .tog svg{transition:transform .2s}
+.scard.open .sc-act .tog svg{transform:rotate(180deg)}
+.sc-b{display:none;padding:4px 16px 16px 40px;border-top:1px solid var(--line)}
+.scard.open .sc-b{display:block}
+.fld{margin-top:12px}
+.fld>label,.fld>.lbl{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);font-weight:600;margin-bottom:7px}
+.fld .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.empty{padding:22px;text-align:center;color:var(--ink-3);border:1px dashed var(--line-2);border-radius:13px;font-size:13px}
+
+/* VOCAL */
+.vtypes{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.vt{border:1px solid var(--line);background:var(--surface-2);border-radius:13px;padding:11px 12px;text-align:left}
+.vt b{display:block;font-size:14px}
+.vt span{font-size:11px;color:var(--ink-3);font-family:var(--f-mono)}
+.vt.on{border-color:var(--accent);background:linear-gradient(160deg,var(--accent-soft),transparent 70%),var(--surface-2)}
+.parts{display:flex;flex-direction:column;gap:6px}
+.prt{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 10px;border-radius:11px;background:var(--surface-2);border:1px solid var(--line)}
+.prt .pn{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.prt .pn i{width:9px;height:9px;border-radius:3px;background:var(--c);flex:0 0 auto}
+.prt select{width:100%}
+.guards{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+.guards .switch{align-items:flex-start}
+.guards .switch span small{display:block;color:var(--ink-3);font-size:11.5px;margin-top:1px}
+
+/* INSTRUMENTS */
+.icat{margin-top:14px}
+.icat h4{margin:0 0 7px;font-size:12px;font-weight:600;color:var(--ink-2)}
+.sfx{display:flex;flex-direction:column;gap:6px}
+.sfxr{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* OUTPUT */
+.out{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto;border-radius:20px;scrollbar-width:thin}
+.out .panel{margin-bottom:12px}
+.oh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.oh h2{font-family:var(--f-disp);font-size:17px;font-weight:600;margin:0}
+.mdl{font-family:var(--f-mono);font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:7px;background:var(--ink);color:var(--bg)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:12px}
+.tabs button{border:0;background:transparent;border-radius:9px;padding:7px 6px;font-size:13px;font-weight:600;color:var(--ink-2);display:flex;flex-direction:column;align-items:center;gap:1px}
+.tabs button small{font-weight:500;font-size:10.5px;color:var(--ink-3);font-family:var(--f-mono)}
+.tabs button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.tabs button.over small{color:var(--err)}
+.pbox{font-family:var(--f-mono);font-size:12.5px;line-height:1.75;white-space:pre-wrap;word-break:break-word;background:var(--code);border:1px solid var(--line);border-radius:13px;padding:14px 15px;min-height:150px;max-height:420px;overflow:auto}
+.tk{border-radius:4px;padding:1px 1px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.tk.l1{color:var(--l1);background:var(--l1-bg)}
+.tk.l2{color:var(--l2);background:var(--l2-bg)}
+.tk.l3{color:var(--l3);background:var(--l3-bg)}
+.tk.l4{color:var(--l4);background:var(--l4-bg);text-decoration:underline wavy;text-decoration-thickness:1px;text-underline-offset:3px}
+.nolv .tk{color:var(--ink);background:none;text-decoration:none}
+.phl{color:var(--ink-3);font-style:italic;background:repeating-linear-gradient(-45deg,transparent 0 6px,var(--surface-2) 6px 12px);border-radius:4px;padding:1px 4px}
+.sep{color:var(--ink-3)}
+.pempty{color:var(--ink-3);font-family:var(--f-ui);font-size:13px}
+.pact{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-size:13px;font-weight:600;color:var(--ink)}
+.btn:hover{border-color:var(--line-2)}
+.btn svg{width:15px;height:15px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover{filter:brightness(1.06)}
+.btn.grow{flex:1}
+.optrow{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}
+.relbar{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin:10px 0 8px;background:var(--surface-2)}
+.relbar span{height:100%}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:12px;color:var(--ink-2)}
+.legend div{display:flex;align-items:center;gap:7px}
+.legend b{font-family:var(--f-mono);font-size:11px;margin-left:auto;color:var(--ink-3);font-weight:500}
+.sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.sw.l1{background:var(--l1)}.sw.l2{background:var(--l2)}.sw.l3{background:var(--l3)}.sw.l4{background:var(--l4)}
+.score{display:flex;align-items:baseline;justify-content:space-between}
+.score .big{font-family:var(--f-disp);font-size:26px;font-weight:600}
+.score span{font-size:12.5px;color:var(--ink-3)}
+.sets{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.set{background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:9px 11px}
+.set span{display:block;font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.set b{font-size:14.5px}
+.set small{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.35;margin-top:2px}
+.set select{margin-top:3px;width:100%}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.checks li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;font-size:13px;line-height:1.45;padding:9px 11px;border-radius:11px;background:var(--surface-2);border:1px solid var(--line)}
+.checks li svg{width:16px;height:16px;margin-top:1px}
+.checks li.err{border-color:var(--err)}
+.checks li.err svg{color:var(--err)}
+.checks li.warn svg{color:var(--warn)}
+.checks li.tip svg{color:var(--l2)}
+.checks li.ok svg{color:var(--ok)}
+.checks .fix{margin-top:6px}
+.cnt-ok{color:var(--ok)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:11px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.mbar{display:none}
+footer.ft{margin-top:10px;font-size:12px;color:var(--ink-3);line-height:1.5}
+
+@media (max-width:1120px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .out{position:static;max-height:none;overflow:visible}
+  .mbar{display:flex;position:fixed;left:12px;right:12px;bottom:12px;gap:8px;z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .mbar .btn{flex:1;height:40px;padding:0 8px}
+  .stepper{display:none}
+}
+@media (max-width:640px){
+  .app{padding:12px 16px 96px}
+  .panel{padding:18px 15px 20px;border-radius:16px}
+  .ggrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sc-h{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"grip name act" "tag tag tag";row-gap:4px;column-gap:6px}
+  .sc-h .grip{grid-area:grip}.sc-h .sc-name{grid-area:name;min-width:0}.sc-h .sc-act{grid-area:act}
+  .sc-tag{grid-area:tag;white-space:normal;padding-left:30px}
+  .sc-act button{width:27px;height:28px}
+  .chip .en{display:none}
+  .pact .btn{padding:0 10px;font-size:12.5px;white-space:nowrap}
+  #copyBtn svg{display:none}
+  .sc-b{padding:4px 12px 14px 12px}
+  .prt{grid-template-columns:1fr;gap:6px}
+  .guards{grid-template-columns:1fr}
+  .tempo{grid-template-columns:1fr}
+  .legend{grid-template-columns:1fr}
+  .brand h1{font-size:18px}
+  .timeline{height:54px}
+  .tlb{padding:6px 10px 5px 6px}
+  .tlb small{display:none}
+  .tln{font-size:10.5px}
+  .tl-hint .kb{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg></div>
+      <div><h1>Конструктор промтов Suno v6</h1><div class="sub">Соберите трек из блоков — промт для Style и Lyrics пишется сам, с подсветкой надёжности каждого тега</div></div>
+    </div>
+    <div class="top-r">
+      <nav class="stepper" aria-label="Шаги">
+        <a href="#s-style"><i>1</i>Стиль</a><a href="#s-struct"><i>2</i>Структура</a><a href="#s-vocal"><i>3</i>Вокал</a><a href="#s-inst"><i>4</i>Инструменты</a>
+      </nav>
+      <button class="icon-btn" id="themeBtn" title="Сменить тему" aria-label="Сменить тему"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+      <button class="icon-btn" id="resetBtn" title="Начать заново"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Сброс</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <!-- STEP 1 -->
+      <section class="panel" id="s-style">
+        <div class="ph"><div class="num">1</div><div><h2>Стиль</h2><p>Выберите один ведущий стиль и, если нужно, второй — как примесь. Один ведущий жанр плюс один партнёр — максимум, при котором v6 держит жанр надёжно.</p></div></div>
+        <div class="gtabs" id="gtabs"></div>
+        <div class="ggrid" id="ggrid"></div>
+        <div class="selbar" id="selbar"></div>
+        <div class="sub-h"><h3>Настроение</h3><span class="cnt" id="moodCnt"></span></div>
+        <div class="chips" id="moods"></div>
+        <div class="sub-h"><h3>Темп и тональность</h3><span class="cnt"><span class="lvd l3" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--l3);margin-right:5px"></span>уровень 3 — подсказка, не настройка</span></div>
+        <div class="tempo">
+          <div class="bpm"><span id="bpmVal">112</span> <small>BPM</small></div>
+          <div class="range-wrap" id="rangeWrap"><div class="zone" id="zone1"></div><div class="zone2" id="zone2"></div><input type="range" id="bpm" min="50" max="200" step="1" aria-label="Темп"></div>
+          <label class="switch"><input type="checkbox" id="useBpm"><span>Писать темп</span></label>
+        </div>
+        <div class="trow">
+          <label class="switch" style="gap:8px">Тональность <select class="sel" id="key"></select></label>
+          <span class="note" style="margin:0" id="tempoNote"></span>
+        </div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="panel" id="s-struct">
+        <div class="ph"><div class="num">2</div><div><h2>Структура</h2><p>Соберите песню из секций: добавляйте, перетаскивайте за ручку, копируйте. Раскройте секцию, чтобы задать ей аранжировку — из этого строится описательная метка вида <code>[Verse 1 - …]</code>.</p></div></div>
+        <div class="sub-h" style="margin-top:0"><h3>Шаблоны</h3></div>
+        <div class="tpls" id="tpls"></div>
+        <div class="sub-h"><h3>Добавить секцию</h3></div>
+        <div class="palette" id="palette"></div>
+        <div class="arr">
+          <div class="arr-scroll" id="arrScroll"><div class="arr-inner" id="arrInner"><div class="ruler" id="ruler"></div><div class="timeline" id="timeline" aria-label="Лента аранжировки"></div></div></div>
+          <div class="tl-hint"><span>Тащите блок мышью — меняйте порядок</span><span>Тяните правый край — меняйте длину</span><span>Клик — настройки секции</span><span class="kb">С клавиатуры: <kbd>←</kbd><kbd>→</kbd> порядок, <kbd>↑</kbd><kbd>↓</kbd> длина</span></div>
+        </div>
+        <div class="tl-meta" id="tlMeta"></div>
+        <div class="cards" id="cards"></div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="panel" id="s-vocal">
+        <div class="ph"><div class="num">3</div><div><h2>Вокал</h2><p>Задайте общую манеру для всего трека, а для отдельных частей — свою. v6 охотно додумывает вокальный план: всё, что не сказано явно, решит модель.</p></div></div>
+        <div class="vtypes" id="vtypes"></div>
+        <p class="note" id="vocNote"></p>
+        <div id="vocalBody">
+          <div class="sub-h"><h3>Тембр</h3><span class="cnt" id="timbreCnt"></span></div>
+          <div class="chips" id="timbre"></div>
+          <div class="sub-h"><h3>Манера для всего вокала</h3></div>
+          <div class="chips" id="deliv"></div>
+          <div class="sub-h"><h3>Манера по частям песни</h3><span class="cnt">пусто = как для всего вокала</span></div>
+          <div class="parts" id="parts"></div>
+          <div class="sub-h"><h3>Исполнение</h3><span class="cnt"><span class="lvd l2" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--l2);margin-right:5px"></span>новый приём v6: глаголы вместо прилагательных</span></div>
+          <div class="chips" id="verbs"></div>
+          <div class="sub-h"><h3>Язык песни</h3></div>
+          <div class="chips" id="lang"></div>
+        </div>
+        <div class="sub-h"><h3>Защита от додумывания v6</h3></div>
+        <div class="guards" id="guards"></div>
+      </section>
+
+      <!-- STEP 4 -->
+      <section class="panel" id="s-inst">
+        <div class="ph"><div class="num">4</div><div><h2>Инструменты и звуки</h2><p>Отмеченные точкой входят в базу выбранного стиля — их можно снять. Давайте инструментам роли, а не просто названия: 4–5 ведущих инструментов — разумный предел.</p></div></div>
+        <div class="sub-h" style="margin-top:0"><h3>Инструменты</h3><span class="cnt" id="instCnt"></span></div>
+        <div id="instCats"></div>
+        <div class="sub-h"><h3>Продакшн</h3><span class="cnt" id="prodCnt"></span></div>
+        <div class="chips" id="prod"></div>
+        <div class="sub-h"><h3>Фактура и атмосфера</h3><span class="cnt">в Style · уровень 3</span></div>
+        <div class="chips" id="tex"></div>
+        <div class="sub-h"><h3>Звуковые события</h3><span class="cnt">метки в Lyrics · только в интро или аутро</span></div>
+        <div class="sfx" id="sfx"></div>
+        <div class="sub-h"><h3>Исключить</h3><span class="cnt" id="exCnt"></span></div>
+        <div class="chips" id="excl"></div>
+        <p class="note">Всё нежелательное — только сюда, категориями. «No humming» в поле Style добавляет humming, а не убирает его.</p>
+      </section>
+      <footer class="ft">Уровни надёжности — эмпирика тестеров и сообщества по модели v6 (октябрь 2026), а не документация Suno: официального списка тегов нет. Оценки с пометкой «перенесено из v5.5» в v6 публично не перепроверялись.</footer>
+    </main>
+
+    <!-- OUTPUT -->
+    <aside class="out" id="out" aria-label="Готовый промт">
+      <div class="panel">
+        <div class="oh"><h2>Готовый промт</h2><span class="mdl" id="mdlBadge">v6</span></div>
+        <div class="tabs" role="tablist" id="tabs">
+          <button data-tab="style" role="tab">Style<small id="tcStyle">0/1000</small></button>
+          <button data-tab="lyrics" role="tab">Lyrics<small id="tcLyr">0</small></button>
+          <button data-tab="excl" role="tab">Exclude<small id="tcEx">0/10</small></button>
+        </div>
+        <div class="pbox" id="pbox" aria-live="polite"></div>
+        <div class="pact">
+          <button class="btn pri grow" id="copyBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span id="copyLbl">Копировать Style</span></button>
+          <button class="btn" id="copyAll" title="Копировать все три поля"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Всё</button>
+          <button class="btn" id="dlBtn" title="Скачать .txt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg>.txt</button>
+        </div>
+        <div class="optrow">
+          <label class="switch"><input type="checkbox" id="showLv" checked><span>Подсветка надёжности</span></label>
+          <label class="switch" id="phWrap"><input type="checkbox" id="showPh" checked><span>Подсказки для текста</span></label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="score"><div><span>Надёжность промта</span><div class="big" id="relPct">—</div></div><span id="relCnt"></span></div>
+        <div class="relbar" id="relbar"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+
+      <div class="panel">
+        <div class="oh" style="margin-bottom:10px"><h2 style="font-size:15px">Выставьте в Suno</h2></div>
+        <div class="sets" id="sets"></div>
+      </div>
+
+      <div class="panel">
+        <div class="oh" style="margin-bottom:10px"><h2 style="font-size:15px">Проверка</h2><span class="cnt" id="chkCnt" style="font-size:12px;color:var(--ink-3)"></span></div>
+        <ul class="checks" id="checks"></ul>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="mbar" id="mbar">
+  <button class="btn pri" data-mcopy="style" title="Копировать Style"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Style</button>
+  <button class="btn pri" data-mcopy="lyrics" title="Копировать Lyrics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Lyrics</button>
+  <button class="btn" data-mcopy="excl" title="Копировать Exclude"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Exclude</button>
+  <button class="btn" id="toOut" aria-label="К промту"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14m0 0-6-6m6 6 6-6"/></svg></button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= ICONS ================= */
+const IC = {
+  grip:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>',
+  down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  dup:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
+  del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  swap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  err:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.01"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17v.01"/></svg>',
+  tip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>',
+  ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>'
+};
+
+/* ================= DATA ================= */
+const LVNAME = {1:'Надёжно',2:'Обычно срабатывает',3:'Зависит от контекста',4:'Высокая дисперсия'};
+
+const GROUPS = [['all','Все'],['pop','Поп и R&B'],['edm','Электроника'],['hiphop','Хип-хоп'],['rock','Рок и акустика'],['mood','Атмосфера и кино']];
+
+const INST = {
+  kit_live:{ru:'Живые барабаны',en:'live acoustic drums',cat:'drums'},
+  kit_punchy:{ru:'Плотные барабаны',en:'tight punchy drums',cat:'drums'},
+  four_floor:{ru:'Прямая бочка 4/4',en:'four-on-the-floor kick',cat:'drums'},
+  trap_hats:{ru:'Трэп-хэты',en:'fast trap hi-hat rolls',cat:'drums'},
+  breakbeat:{ru:'Брейкбит',en:'chopped breakbeat drums',cat:'drums'},
+  drum_machine:{ru:'Драм-машина',en:'vintage drum machine',cat:'drums'},
+  brushes:{ru:'Щётки',en:'soft brushed drums',cat:'drums'},
+  perc:{ru:'Перкуссия',en:'hand percussion and shakers',cat:'drums'},
+  claps:{ru:'Хлопки',en:'crisp claps',cat:'drums'},
+  cine_perc:{ru:'Кино-ударные',en:'cinematic taiko percussion',cat:'drums'},
+  ac_gtr:{ru:'Акустика, перебор',en:'fingerpicked acoustic guitar',cat:'guitars'},
+  strum_gtr:{ru:'Акустика, бой',en:'strummed acoustic guitar',cat:'guitars'},
+  clean_gtr:{ru:'Чистая электрогитара',en:'clean electric guitar',cat:'guitars'},
+  dist_gtr:{ru:'Перегруженные гитары',en:'distorted electric guitars',cat:'guitars'},
+  palm_gtr:{ru:'Палм-мьют риф',en:'palm-muted guitar riff',cat:'guitars'},
+  funk_gtr:{ru:'Фанк-гитара',en:'funky rhythm guitar',cat:'guitars'},
+  el_bass:{ru:'Бас-гитара',en:'electric bass',cat:'bass'},
+  synth_bass:{ru:'Синт-бас',en:'warm analog synth bass',cat:'bass'},
+  sub_bass:{ru:'Саб-бас',en:'deep sub bass',cat:'bass'},
+  bass_808:{ru:'808',en:'deep sliding 808 bass',cat:'bass'},
+  upright:{ru:'Контрабас',en:'upright bass',cat:'bass'},
+  reese:{ru:'Риз-бас',en:'growling reese bass',cat:'bass'},
+  piano:{ru:'Фортепиано',en:'piano',cat:'keys'},
+  grand:{ru:'Рояль',en:'intimate grand piano',cat:'keys'},
+  rhodes:{ru:'Rhodes',en:'Rhodes electric piano',cat:'keys'},
+  organ:{ru:'Орган',en:'Hammond organ',cat:'keys'},
+  pads:{ru:'Пэды',en:'lush atmospheric pads',cat:'synths'},
+  arp:{ru:'Арпеджио',en:'arpeggiated synths',cat:'synths'},
+  lead:{ru:'Синт-лид',en:'bright synth lead',cat:'synths'},
+  plucks:{ru:'Плаки',en:'synth plucks',cat:'synths'},
+  supersaw:{ru:'Суперсо-аккорды',en:'supersaw chords',cat:'synths'},
+  retro_poly:{ru:'Ретро-полисинт',en:'retro analog polysynths',cat:'synths'},
+  vox_chops:{ru:'Вокальные чопы',en:'pitched vocal chops',cat:'synths'},
+  strings:{ru:'Струнные',en:'string section',cat:'orch'},
+  cello:{ru:'Виолончель',en:'solo cello',cat:'orch'},
+  orchestra:{ru:'Оркестр',en:'full orchestra',cat:'orch'},
+  choir_pad:{ru:'Хор без слов',en:'wordless choir',cat:'orch'},
+  brass:{ru:'Медные духовые',en:'brass section',cat:'brass'},
+  sax:{ru:'Саксофон',en:'saxophone',cat:'brass'},
+  trumpet:{ru:'Труба с сурдиной',en:'muted trumpet',cat:'brass'},
+  flute:{ru:'Флейта',en:'flute',cat:'brass'},
+  accordion:{ru:'Аккордеон',en:'accordion',cat:'world'},
+  balalaika:{ru:'Балалайка',en:'balalaika',cat:'world'},
+  kalimba:{ru:'Калимба',en:'kalimba',cat:'world'},
+  harp:{ru:'Арфа',en:'harp',cat:'world'},
+  bells:{ru:'Колокольчики',en:'glockenspiel',cat:'world'},
+  music_box:{ru:'Шкатулка',en:'music box',cat:'world'}
+};
+const INST_CATS = [['drums','Ударные'],['guitars','Гитары'],['bass','Бас'],['keys','Клавиши'],['synths','Синтезаторы'],['orch','Оркестр и хор'],['brass','Духовые'],['world','Этника и краски']];
+const SLOT = {drums:'drums',guitars:'guitars',bass:'bass',keys:'other',synths:'other',orch:'other',brass:'other',world:'other'};
+
+const G = {
+  pop:{ru:'Поп',g:'pop',en:'modern pop',energy:3,bpm:[95,125,112],inst:{kit_punchy:'tight punchy drums with crisp claps',synth_bass:'warm synth bass locked to the kick',plucks:'bright synth plucks'},arr:'sparse verses, big layered chorus',prod:'clean wide mix, lead vocal upfront',end:'clean ending on the final chorus',fusion:'catchy pop hooks',tmpl:'pop',voc:{type:'female',delivery:'intimate',timbre:['bright']}},
+  dancepop:{ru:'Дэнс-поп',g:'pop',en:'dance pop',energy:4,bpm:[115,128,122],inst:{four_floor:'four-on-the-floor kick with offbeat hats',synth_bass:'pumping synth bass',supersaw:'bright supersaw chords'},arr:'building pre-chorus, euphoric chorus',prod:'punchy club-ready mix',end:'ends on a final hook',fusion:'four-on-the-floor dance energy',tmpl:'pop',voc:{type:'female',delivery:'belted',timbre:['bright']}},
+  rupop:{ru:'Русский поп',g:'pop',en:'Russian pop',energy:3,bpm:[90,120,104],inst:{kit_punchy:'steady pop drums',piano:'melodic piano',strings:'soft string pads'},arr:'melodic verses, singalong chorus',prod:'warm polished mix, lead vocal upfront',end:'final chorus then a soft ending',fusion:'melodic Russian pop phrasing',tmpl:'pop',voc:{type:'female',delivery:'intimate',timbre:['warm']}},
+  rnb:{ru:'R&B / соул',g:'pop',en:'contemporary R&B',energy:2,bpm:[65,100,84],inst:{kit_punchy:'laid-back crisp drums',sub_bass:'round sub bass',rhodes:'smooth Rhodes chords'},arr:'smooth groove, lush harmonies in the chorus',prod:'silky intimate mix',end:'fades out on ad-libs',fusion:'smooth R&B chords and groove',tmpl:'pop',voc:{type:'female',delivery:'soft',timbre:['soulful','breathy']}},
+  indiepop:{ru:'Инди-поп',g:'pop',en:'indie pop',energy:3,bpm:[100,128,116],inst:{kit_live:'loose live drums',clean_gtr:'jangly clean guitars',el_bass:'melodic bass line',retro_poly:'dreamy synths'},arr:'understated verses, lifting chorus',prod:'warm, slightly lo-fi production',end:'ends on the guitar riff',fusion:'jangly indie guitars',tmpl:'pop',voc:{type:'male',delivery:'intimate',timbre:['airy']}},
+  house:{ru:'Хаус',g:'edm',en:'deep house',energy:3,bpm:[118,126,122],inst:{four_floor:'four-on-the-floor kick with shuffled open hats',sub_bass:'rolling deep bass',rhodes:'warm Rhodes stabs',pads:'airy pads'},arr:'long groove, filtered build into smooth drops',prod:'warm club mix',end:'DJ-friendly outro',fusion:'four-on-the-floor house groove',tmpl:'dance',voc:{type:'female',delivery:'soft',timbre:['airy']}},
+  slaphouse:{ru:'Слэп-хаус',g:'edm',en:'slap house',energy:4,bpm:[120,126,124],inst:{four_floor:'punchy four-on-the-floor kick',synth_bass:'bouncy slap bass with pitch slides',plucks:'catchy plucked lead',vox_chops:'pitched vocal chops'},arr:'minimal verse, bass-driven drop',prod:'loud punchy mix with heavy sidechain pumping',end:'ends after the last drop',fusion:'bouncy slap house bass',tmpl:'dance',voc:{type:'male',delivery:'soft',timbre:['deep']}},
+  techno:{ru:'Техно',g:'edm',en:'techno',energy:4,bpm:[124,138,130],inst:{four_floor:'driving four-on-the-floor kick',synth_bass:'hypnotic rolling bassline',arp:'evolving modular arpeggios'},arr:'slow evolving layers, tension and release',prod:'dark warehouse sound',end:'stripped-back outro',fusion:'driving techno pulse',tmpl:'inst',voc:{type:'none',delivery:'',timbre:[]}},
+  dnb:{ru:'Драм-н-бейс',g:'edm',en:'liquid drum and bass',energy:4,bpm:[170,176,174],inst:{breakbeat:'fast rolling breakbeats',reese:'deep reese bass',pads:'lush pads'},arr:'atmospheric intro, rolling drops',prod:'crisp wide mix',end:'atmospheric outro',fusion:'rolling drum and bass breaks',tmpl:'dance',voc:{type:'female',delivery:'soft',timbre:['airy']}},
+  synthwave:{ru:'Синтвейв',g:'edm',en:'80s synthwave',energy:3,bpm:[90,118,104],inst:{drum_machine:'gated-reverb drum machine',synth_bass:'pulsing analog bass',retro_poly:'retro analog polysynths',lead:'soaring synth lead'},arr:'night-drive build, big chorus',prod:'1980s production, wide stereo',end:'fades out on the synth lead',fusion:'80s analog synths',tmpl:'pop',voc:{type:'male',delivery:'intimate',timbre:['airy']}},
+  phonk:{ru:'Фонк',g:'edm',en:'drift phonk',energy:5,bpm:[130,160,145],inst:{drum_machine:'Memphis-style cowbell drum pattern',bass_808:'distorted 808 bass',vox_chops:'chopped vocal samples'},arr:'aggressive loop with hard drops',prod:'dark distorted lo-fi mix',end:'abrupt ending',fusion:'cowbell phonk drums and distorted 808',tmpl:'dance',voc:{type:'none',delivery:'',timbre:[]}},
+  hiphop:{ru:'Хип-хоп / бумбэп',g:'hiphop',en:'boom bap hip-hop',energy:3,bpm:[84,96,90],inst:{breakbeat:'dusty boom bap drums',el_bass:'deep bass line',piano:'jazzy piano sample loop'},arr:'head-nodding loop, hook in the chorus',prod:'dusty vinyl texture',end:'beat fades out',fusion:'boom bap drum groove',tmpl:'rap',voc:{type:'male',delivery:'rap',timbre:['deep']},hookSung:false},
+  trap:{ru:'Трэп',g:'hiphop',en:'trap',energy:4,bpm:[130,150,140],inst:{trap_hats:'fast trap hi-hat rolls',bass_808:'deep sliding 808 bass',bells:'dark bell melody'},arr:'sparse verses, heavy hook',prod:'punchy modern mix',end:'beat cuts out',fusion:'trap hi-hats and 808',tmpl:'rap',voc:{type:'male',delivery:'rap',timbre:['gritty']}},
+  melrap:{ru:'Мелодичный рэп',g:'hiphop',en:'melodic rap',energy:3,bpm:[130,160,145],inst:{trap_hats:'bouncy hi-hats',bass_808:'smooth 808 bass',clean_gtr:'melancholic guitar loop',pads:'soft pads'},arr:'melodic verses, catchy sung hook',prod:'modern clean mix, vocal upfront',end:'beat fades out',fusion:'melodic rap flow',tmpl:'rap',voc:{type:'male',delivery:'rap',timbre:['warm']},hookSung:true},
+  altrock:{ru:'Альт-рок',g:'rock',en:'alternative rock',energy:4,bpm:[100,140,120],inst:{kit_live:'hard-hitting live drums',dist_gtr:'distorted guitars',palm_gtr:'palm-muted riff in the verses',el_bass:'driving bass'},arr:'restrained verses, explosive chorus',prod:'live band sound, recorded together',end:'ends on a big final chord',fusion:'distorted alt-rock guitars',tmpl:'rock',voc:{type:'male',delivery:'belted',timbre:['raspy']}},
+  poppunk:{ru:'Поп-панк',g:'rock',en:'pop punk',energy:5,bpm:[160,190,174],inst:{kit_live:'fast energetic drums',dist_gtr:'power-chord guitars',el_bass:'driving bass'},arr:'fast verses, anthemic singalong chorus',prod:'bright punchy mix',end:'abrupt full stop',fusion:'energetic pop-punk guitars',tmpl:'rock',voc:{type:'male',delivery:'belted',timbre:['bright']}},
+  metal:{ru:'Метал',g:'rock',en:'modern metal',energy:5,bpm:[100,180,150],inst:{kit_live:'double-kick drums',dist_gtr:'heavy down-tuned guitars',palm_gtr:'chugging palm-muted riffs',el_bass:'heavy bass'},arr:'crushing verses, melodic chorus, heavy breakdown',prod:'tight aggressive mix',end:'ends on a final hit',fusion:'heavy metal riffs',tmpl:'rock',model:'v6-wild',voc:{type:'male',delivery:'shouted',timbre:['powerful']}},
+  folk:{ru:'Акустика / фолк',g:'rock',en:'acoustic folk',energy:2,bpm:[80,120,96],inst:{strum_gtr:'warm strummed acoustic guitar',perc:'light hand percussion',upright:'soft upright bass'},arr:'gentle verses, warm singalong chorus',prod:'intimate live room sound',end:'ends with a single guitar strum',fusion:'warm acoustic guitar',tmpl:'ballad',ex:['autotune'],voc:{type:'male',delivery:'intimate',timbre:['warm']}},
+  ambient:{ru:'Эмбиент',g:'mood',en:'ambient',energy:1,bpm:[60,90,70],inst:{pads:'slowly evolving pads',piano:'sparse reverb piano'},arr:'beatless, slowly evolving soundscape',prod:'vast spacious reverb',end:'dissolves into silence',fusion:'ambient textures',tmpl:'inst',tex:['field'],voc:{type:'none',delivery:'',timbre:[]}},
+  lofi:{ru:'Lo-fi',g:'mood',en:'lo-fi hip-hop',energy:1,bpm:[70,90,80],inst:{drum_machine:'dusty laid-back drums',rhodes:'mellow jazzy Rhodes chords',el_bass:'soft round bass'},arr:'relaxed loop with gentle variations',prod:'warm lo-fi texture',end:'fades out',fusion:'dusty lo-fi texture',tmpl:'inst',tex:['vinyl'],voc:{type:'none',delivery:'',timbre:[]}},
+  cinematic:{ru:'Кино / эпик',g:'mood',en:'epic cinematic',energy:4,bpm:[70,110,90],inst:{cine_perc:'thunderous taiko percussion',orchestra:'full orchestra',choir_pad:'epic wordless choir'},arr:'slow build to a massive climax',prod:'huge hall reverb',end:'final massive hit, then silence',fusion:'cinematic orchestral scale',tmpl:'inst',voc:{type:'none',delivery:'',timbre:[]}},
+  ballad:{ru:'Фортепианная баллада',g:'mood',en:'piano ballad',energy:2,bpm:[60,85,72],inst:{grand:'intimate grand piano',strings:'swelling strings in the chorus'},arr:'quiet verses, emotional chorus, stripped bridge',prod:'intimate close-miked sound',end:'ends on soft piano',fusion:'emotional piano ballad',tmpl:'ballad',ex:['EDM drop'],voc:{type:'female',delivery:'intimate',timbre:['warm']}},
+  jazz:{ru:'Джаз / лаунж',g:'mood',en:'smooth jazz lounge',energy:2,bpm:[80,120,96],inst:{brushes:'soft brushed drums',upright:'walking upright bass',piano:'jazz piano',sax:'smooth saxophone'},arr:'relaxed swing with a solo section',prod:'warm intimate club sound',end:'ends on a soft jazz chord',fusion:'jazz harmony and swing',tmpl:'ballad',ex:['autotune'],voc:{type:'female',delivery:'crooning',timbre:['smoky']}}
+};
+const G_ORDER = ['pop','dancepop','rupop','rnb','indiepop','house','slaphouse','techno','dnb','synthwave','phonk','hiphop','trap','melrap','altrock','poppunk','metal','folk','ambient','lofi','cinematic','ballad','jazz'];
+
+const MOODS = {dark:['мрачное','dark'],melancholic:['меланхоличное','melancholic'],uplifting:['светлое','uplifting'],euphoric:['эйфоричное','euphoric'],dreamy:['мечтательное','dreamy'],aggressive:['агрессивное','aggressive'],romantic:['романтичное','romantic'],nostalgic:['ностальгичное','nostalgic'],intimate:['камерное','intimate'],epic:['эпичное','epic'],playful:['игривое','playful'],hypnotic:['гипнотичное','hypnotic'],tense:['напряжённое','tense']};
+const MOOD_CONFLICT = [['dark','playful'],['aggressive','dreamy'],['melancholic','euphoric'],['aggressive','romantic'],['tense','dreamy']];
+const KEYS = ['C major','C minor','D major','D minor','E major','E minor','F major','F minor','G major','G minor','A major','A minor','B major','B minor'];
+
+const SEC = {
+  intro:{ru:'Интро',en:'Intro',c:'#8b93a7',bars:8,vox:false,lvB:2,lvD:1,arr:['short'],energy:2},
+  verse:{ru:'Куплет',en:'Verse',c:'#4c7dff',bars:16,vox:true,lvB:2,lvD:1,arr:[],energy:1},
+  pre:{ru:'Предприпев',en:'Pre-Chorus',c:'#14a596',bars:8,vox:true,lvB:2,lvD:1,arr:['building'],energy:2},
+  chorus:{ru:'Припев',en:'Chorus',c:'#ff5a36',bars:16,vox:true,lvB:2,lvD:1,arr:['full'],energy:2},
+  post:{ru:'Постприпев',en:'Post-Chorus',c:'#ff9433',bars:8,vox:true,lvB:2,lvD:2,arr:['hook_rep'],energy:2},
+  hook:{ru:'Хук',en:'Hook',c:'#e2559b',bars:8,vox:true,lvB:2,lvD:2,arr:[],energy:3},
+  bridge:{ru:'Бридж',en:'Bridge',c:'#8f63ff',bars:8,vox:true,lvB:2,lvD:1,arr:['stripped'],energy:2},
+  breakdown:{ru:'Брейкдаун',en:'Breakdown',c:'#26a9d0',bars:8,vox:false,lvB:2,lvD:2,arr:['drums_out'],energy:2},
+  build:{ru:'Нарастание',en:'Build',c:'#2fb796',bars:8,vox:false,lvB:3,lvD:3,arr:['building'],energy:2},
+  drop:{ru:'Дроп',en:'Drop',c:'#df3348',bars:16,vox:false,lvB:3,lvD:3,arr:['full_energy'],energy:2},
+  beat:{ru:'Бит-свитч',en:'Beat Switch',c:'#b57cf0',bars:8,vox:true,lvB:3,lvD:3,arr:['new_beat'],energy:2},
+  inst:{ru:'Инструментал',en:'Instrumental Break',c:'#3fa36c',bars:8,vox:false,noVox:true,lvB:2,lvD:1,arr:[],energy:2},
+  solo:{ru:'Соло',en:'Solo',c:'#8fb12a',bars:8,vox:false,noVox:true,lvB:2,lvD:1,arr:[],energy:2},
+  interlude:{ru:'Интерлюдия',en:'Interlude',c:'#5fae84',bars:4,vox:false,lvB:2,lvD:2,arr:['quiet'],energy:2},
+  outro:{ru:'Аутро',en:'Outro',c:'#767c8e',bars:8,vox:false,lvB:2,lvD:1,arr:[],energy:2,ending:'fade'},
+  end:{ru:'Конец',en:'End',c:'#4b5060',bars:0,vox:false,noVox:true,lvB:2,lvD:2,arr:[],energy:2,noDesc:true}
+};
+const SEC_ORDER = ['intro','verse','pre','chorus','post','hook','bridge','breakdown','build','drop','beat','inst','solo','interlude','outro','end'];
+
+const ARR = {
+  short:{ru:'Коротко',en:'short',lv:1},
+  atmospheric:{ru:'Атмосферно',en:'atmospheric',lv:2},
+  sparse:{ru:'Разреженно',en:'sparse',lv:1},
+  full:{ru:'Вся группа',en:'full band',lv:1},
+  under:{ru:'Группа играет под вокалом',en:'band plays under the vocal',lv:1},
+  open:{ru:'Барабаны раскрываются',en:'drums open up',lv:1},
+  building:{ru:'Нарастание',en:'building tension',lv:2},
+  drums_out:{ru:'Барабаны уходят',en:'drums drop out',lv:2},
+  piano_only:{ru:'Только фортепиано',en:'piano only',lv:2,req:['piano','grand','rhodes'],reqRu:'фортепиано',add:'piano'},
+  acoustic:{ru:'Только акустика',en:'stripped down acoustic',lv:2,req:['ac_gtr','strum_gtr'],reqRu:'акустическую гитару',add:'ac_gtr'},
+  bass_drums:{ru:'Бас и барабаны',en:'bass and drums only',lv:2},
+  stripped:{ru:'Облегчённо',en:'stripped down',lv:2},
+  harmonies:{ru:'Бэк-гармонии',en:'layered harmonies',lv:2},
+  hook_rep:{ru:'Хук повторяется',en:'hook repeats',lv:2},
+  acapella:{ru:'А капелла',en:'a cappella',lv:2},
+  full_energy:{ru:'Максимум энергии',en:'full energy',lv:2},
+  quiet:{ru:'Тихо',en:'quiet',lv:2},
+  new_beat:{ru:'Новый бит',en:'new beat',lv:3},
+  filtered:{ru:'Фильтр, издалека',en:'filtered, distant',lv:3},
+  sudden:{ru:'Резкий обрыв',en:'sudden drop',lv:3},
+  halftime:{ru:'Халфтайм',en:'half-time feel',lv:4}
+};
+const ARR_ORDER = ['short','sparse','full','under','open','building','stripped','drums_out','bass_drums','piano_only','acoustic','harmonies','hook_rep','acapella','full_energy','quiet','atmospheric','new_beat','filtered','sudden','halftime'];
+const ENERGY = {1:{ru:'Сдержанно',en:'restrained'},2:{ru:'Обычно',en:''},3:{ru:'Мощно',en:'high energy'}};
+const ENDINGS = {fade:{ru:'Затухание',en:'fade out',lv:1,style:'ends with a slow fade out'},stop:{ru:'Чёткая остановка',en:'clean full stop',lv:2,style:'ends with a clean full stop'},slow:{ru:'Замедление',en:'slows down to the end',lv:3,style:'slows down at the end'},none:{ru:'Не указывать',en:'',lv:2,style:''}};
+const SOLO = {
+  guitar:{ru:'Гитара',en:'Guitar',req:['clean_gtr','dist_gtr','palm_gtr','funk_gtr','ac_gtr','strum_gtr'],add:'clean_gtr'},
+  piano:{ru:'Фортепиано',en:'Piano',req:['piano','grand','rhodes'],add:'piano'},
+  sax:{ru:'Саксофон',en:'Sax',req:['sax'],add:'sax'},
+  synth:{ru:'Синтезатор',en:'Synth',req:['lead','retro_poly','supersaw','plucks','arp'],add:'lead'},
+  violin:{ru:'Скрипка',en:'Violin',req:['strings','orchestra','cello'],add:'strings'},
+  bass:{ru:'Бас',en:'Bass',req:['el_bass','synth_bass','sub_bass','bass_808','upright','reese'],add:'el_bass'},
+  trumpet:{ru:'Труба',en:'Trumpet',req:['trumpet','brass'],add:'trumpet'}
+};
+
+const VTYPE = {
+  female:{ru:'Женский',sub:'[Female Singer]',style:'female lead vocal',tag:'[Female Singer]',lv:1},
+  male:{ru:'Мужской',sub:'[Male Singer]',style:'male lead vocal',tag:'[Male Singer]',lv:1},
+  duet:{ru:'Дуэт',sub:'[Duet]',style:'male and female duet vocals',tag:'[Duet]',lv:2},
+  choir:{ru:'Хор',sub:'[Choir]',style:'choir vocals',tag:'[Choir]',lv:2},
+  none:{ru:'Без вокала',sub:'instrumental',style:'instrumental track',tag:null,lv:2}
+};
+const TIMBRE = {warm:['тёплый','warm'],bright:['яркий','bright'],breathy:['с придыханием','breathy'],airy:['воздушный','airy'],raspy:['с хрипотцой','raspy'],deep:['низкий','deep'],powerful:['сильный','powerful'],smoky:['дымный','smoky'],soulful:['соульный','soulful'],gritty:['шершавый','gritty']};
+const DELIV = {
+  intimate:{ru:'Интимно',style:'intimate, close vocal delivery',tag:'intimate, chest voice',lvS:2,lvT:1},
+  soft:{ru:'Мягко',style:'soft, gentle delivery',tag:'soft',lvS:2,lvT:1},
+  belted:{ru:'В полный голос',style:'powerful belted delivery',tag:'belted, full voice',lvS:2,lvT:1},
+  whispered:{ru:'Шёпотом',style:'whispered delivery',tag:'whispered',lvS:2,lvT:1},
+  falsetto:{ru:'Фальцет',style:'falsetto',tag:'falsetto',lvS:2,lvT:1},
+  sung:{ru:'Мелодично',style:'melodic singing',tag:'melodic sung hook',lvS:2,lvT:1},
+  rap:{ru:'Рэп',style:'rhythmic rap flow',tag:'rap flow',lvS:2,lvT:1},
+  spoken:{ru:'Речитатив',style:'spoken word delivery',tag:'spoken word',lvS:2,lvT:2},
+  chant:{ru:'Скандирование',style:'group chant vocals',tag:'group chant',lvS:2,lvT:2},
+  crooning:{ru:'Крунинг',style:'crooning',tag:'crooning',lvS:3,lvT:3},
+  operatic:{ru:'Оперно',style:'operatic vocals',tag:'operatic',lvS:3,lvT:3},
+  shouted:{ru:'Крик',style:'raw shouted vocals',tag:'shouted',lvS:3,lvT:3,heavy:true},
+  screamed:{ru:'Скрим',style:'screamed vocals',tag:'screamed',lvS:3,lvT:3,heavy:true},
+  growl:{ru:'Гроул',style:'growled vocals',tag:'growled',lvS:3,lvT:3,heavy:true}
+};
+const SINGER = {f:{ru:'Ж',en:'female vocal'},m:{ru:'М',en:'male vocal'},both:{ru:'Оба',en:'both voices'}};
+const VERBS = {
+  breath:{ru:'Вдох перед каждой строкой',en:'takes a breath before each line'},
+  hold:{ru:'Тянет последнее слово припева',en:'holds the last word of each chorus line'},
+  push:{ru:'Напирает в припеве',en:'pushes harder in the chorus'},
+  pull:{ru:'Сдержанно в куплетах',en:'pulls back in the verses'},
+  imperfect:{ru:'Живой, неидеальный',en:'imperfect, slightly raw vocal'}
+};
+const LANG = {ru:{ru:'Русский'},en:{ru:'Английский'},other:{ru:'Другой'}};
+const PROD = {
+  vox_front:{ru:'Вокал впереди, сухо',en:'lead vocal upfront, close-miked and dry',lv:2},
+  room:{ru:'Живая комната',en:'live room sound, band recorded together',lv:2},
+  wide:{ru:'Широкое стерео',en:'wide stereo image',lv:2},
+  era80:{ru:'Звук 80-х',en:'1980s production',lv:2},
+  era90:{ru:'Звук 90-х',en:'1990s production',lv:2},
+  raw:{ru:'Сырой, живой',en:'raw, unpolished sound',lv:2},
+  lofi_tex:{ru:'Lo-fi',en:'lo-fi texture',lv:2},
+  analog:{ru:'Тёплый аналог',en:'warm analog tape saturation',lv:3},
+  space:{ru:'Большое пространство',en:'big reverb-drenched space',lv:3},
+  punchy:{ru:'Плотный, сжатый',en:'punchy compressed drums',lv:3},
+  radio:{ru:'«Радиоформат»',en:'polished radio-ready mix',lv:3}
+};
+const TEX = {vinyl:['Винил','vinyl crackle'],tape:['Плёночный шум','tape hiss'],rain:['Дождь фоном','rain ambience'],field:['Полевые записи','field recordings'],risers:['Райзеры','risers and sweeps'],crowd:['Публика','live crowd ambience']};
+const SFX = {rain:{ru:'Дождь',en:'Rain',lv:3},thunder:{ru:'Гром',en:'Thunder',lv:3},vinyl:{ru:'Треск винила',en:'Vinyl Crackle',lv:3},applause:{ru:'Аплодисменты',en:'Applause',lv:3},crowd:{ru:'Шум толпы',en:'Crowd Noise',lv:3},riser:{ru:'Райзер',en:'Riser',lv:3},revcym:{ru:'Реверс-тарелка',en:'Reverse Cymbal',lv:3},phone:{ru:'Звонок телефона',en:'Phone Ringing',lv:4},steps:{ru:'Шаги',en:'Footsteps',lv:4},wind:{ru:'Ветер',en:'Wind',lv:4}};
+const EXCL_KEYS = ['rap','spoken word','autotune','humming','whistling','choir','backing vocals','female vocals','male vocals','vocals','drums','percussion','EDM drop','guitar solo','distorted guitars','synth','strings','saxophone','808','orchestra'];
+const EXCL_RU = {'rap':'рэп','spoken word':'речитатив','autotune':'автотюн','humming':'мычание','whistling':'свист','choir':'хор','backing vocals':'бэк-вокал','female vocals':'женский вокал','male vocals':'мужской вокал','vocals':'вокал','drums':'барабаны','percussion':'перкуссия','EDM drop':'EDM-дроп','guitar solo':'гитарное соло','distorted guitars':'перегруз','synth':'синтезаторы','strings':'струнные','saxophone':'саксофон','808':'808','orchestra':'оркестр'};
+const EXCL_CONFLICT = {'drums':i=>INST[i].cat==='drums','percussion':i=>i==='perc'||i==='cine_perc','synth':i=>INST[i].cat==='synths','strings':i=>['strings','orchestra','cello'].includes(i),'saxophone':i=>i==='sax','808':i=>i==='bass_808','distorted guitars':i=>i==='dist_gtr','orchestra':i=>i==='orchestra','choir':i=>i==='choir_pad'};
+
+const TEMPLATES = {
+  pop:{ru:'Поп-стандарт',seq:['intro','verse','pre','chorus','verse','pre','chorus','bridge','chorus','outro','end']},
+  short:{ru:'Короткий · до 2 мин',seq:['verse','chorus','verse','chorus','outro','end']},
+  ballad:{ru:'Баллада',seq:['intro','verse','verse','chorus','verse','chorus','bridge','chorus','outro','end']},
+  dance:{ru:'Танцевальный',seq:['intro','verse','build','drop','breakdown','verse','build','drop','outro','end']},
+  rap:{ru:'Рэп',seq:['intro','hook','verse','hook','verse','hook','outro','end']},
+  rock:{ru:'Рок',seq:['intro','verse','chorus','verse','chorus','solo','bridge','chorus','outro','end']},
+  inst:{ru:'Инструментал',seq:['intro','inst','interlude','inst','outro','end']}
+};
+
+const TIPS = {
+  genre:'Ведущий жанр первым в поле Style — самый надёжный элемент промта.',
+  fusion:'Второй стиль подан как партнёр по фьюжну. Один ведущий жанр плюс один партнёр — максимум, при котором v6 держит жанр.',
+  mood:'Настроение — характеристика всего трека; его место в Style.',
+  bpm:'Темп в Style — данные противоречат: одни тестеры советуют писать число, другие видят, что v6 игнорирует темп.',
+  key:'Тональность в Style — данные противоречат; считайте подсказкой, а не настройкой.',
+  vtype:'Пол и тип вокала в Style дублируют метку в Lyrics — в связке это надёжнее, чем по отдельности.',
+  timbre:'Тембр в Style — рабочее описание вокала.',
+  deliv:'Общая манера исполнения в Style.',
+  single:'Защита v6: без явного «один голос» модель может добавить второй голос или дуэт сама.',
+  lang:'Указание языка — рабочая подсказка.',
+  diction:'«Чёткая дикция» — популярный совет для русского текста, но надёжного подтверждения на v6 нет.',
+  harm:'Гармонии в припеве — работающее указание в Style.',
+  verb:'Новый приём v6: глаголы исполнения работают лучше прилагательных.',
+  inst:'Инструмент с ролью в Style — v6 понимает музыкантскую лексику.',
+  instMany:'Больше 4–5 инструментов: v6 может проредить аранжировку. Давайте каждому роль.',
+  arr:'Описание аранжировки — v6 читает его буквально.',
+  under:'Защита v6: без этого группа часто стихает под вокалом.',
+  prod:'Описание продакшна языком расстановки — v6 читает буквальнее прилагательных.',
+  tex:'Фактура и шумы в Style — срабатывают, но окрашивают весь трек.',
+  end:'Финал в Style совпадает с меткой Outro в Lyrics — так модель не получает противоречия.',
+  vtag:'Надёжный способ задать пол вокала. В v6 не опровергнут и продублирован в Style.',
+  vtag2:'Работает в большинстве случаев; дублирован в Style.',
+  secD:'Описательная метка секции — рекомендуемый формат v6: модель читает указания внутри скобки.',
+  secB:'Голая метка: делит текст на секции, но слышимую смену v6 даёт не всегда.',
+  sec3:'Тег работает внутри своих жанров (танцевальная, хип-хоп), вне их — непредсказуемо.',
+  itemArr:'Указание аранжировки внутри метки секции.',
+  itemDeliv:'Подача внутри метки секции — v6 воспроизводит её по секциям.',
+  itemDeliv3:'Экстремальная подача зависит от жанра в Style.',
+  singer:'Кто поёт в этой секции — для дуэта это главное, иначе модель решит сама.',
+  energy:'Энергия секции — рабочее указание.',
+  custom:'Своё указание. Держите его коротким и на английском.',
+  customRu:'Кириллица внутри метки: теги работают только на английском, высок риск, что это споют.',
+  long:'Метка длиннее 8 слов — растёт риск, что её споют. Сократите описание.',
+  sfx3:'Звуковые теги срабатывают чаще в интро и аутро.',
+  sfx4:'Высокий риск, что название звука споют или изобразят голосом.',
+  endtag:'[End] в паре с [Outro] помогает трек закончить.',
+  solo:'Событийный тег соло — работает, если жанр предполагает соло.'
+};
+
+/* ================= STATE ================= */
+const LS_KEY = 'suno6-prompt-builder-v2';
+let uidC = 1;
+function mkSec(type, extra){
+  const d = SEC[type];
+  return Object.assign({uid:uidC++, type, arr:[...d.arr], energy:d.energy||2, custom:'', desc:true, bars:d.bars, vox:null, delivery:'', singer:'both', solo:'guitar', ending:d.ending||'none'}, extra||{});
+}
+function defaultState(){
+  return {
+    genres:[], moods:[], bpm:112, useBpm:true, key:'', bpmTouched:false,
+    sections: [], structTouched:false,
+    vocal:{type:null, timbre:[], delivery:'', verbs:[], harmonies:false, lang:''}, vocTouched:false,
+    guards:{single:true, norap:true, under:true, opposite:false},
+    inst:[], instTouched:false, prod:[], tex:[], texTouched:false, sfx:{}, exclude:[], exTouched:false,
+    model:'auto', tab:'style', showLv:true, showPh:true, gtab:'all'
+  };
+}
+let state = defaultState();
+const openSet = new Set();
+
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY); if(!raw) return;
+    const s = JSON.parse(raw);
+    const d = defaultState();
+    state = Object.assign(d, s);
+    state.vocal = Object.assign(d.vocal, s.vocal||{});
+    state.guards = Object.assign(d.guards, s.guards||{});
+    state.sections = (s.sections||[]).filter(x=>SEC[x.type]).map(x=>Object.assign(mkSec(x.type), x, {uid:uidC++}));
+    state.genres = (state.genres||[]).filter(g=>G[g]).slice(0,2);
+  }catch(e){ state = defaultState(); }
+}
+
+/* ================= HELPERS ================= */
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tk = (t,lv,tip)=>({t,lv,tip});
+const fmtTime = s => { s=Math.round(s); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+const hasCyr = s => /[а-яё]/i.test(s);
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),1800); }
+function primary(){ return G[state.genres[0]]; }
+function secondary(){ return G[state.genres[1]]; }
+function effVox(s){ if(state.vocal.type==='none' || SEC[s.type].noVox) return false; return (s.vox===null||s.vox===undefined) ? SEC[s.type].vox : s.vox; }
+function secDur(s){ return (s.bars||0)*4*60/(state.bpm||110); }
+function labels(){
+  let v=0; const cnt={};
+  return state.sections.map(s=>{
+    cnt[s.type]=(cnt[s.type]||0)+1; const d=SEC[s.type]; let ru=d.ru, en=d.en;
+    if(s.type==='verse'){ v++; ru='Куплет '+v; en='Verse '+v; }
+    else if(cnt[s.type]>1 && s.type!=='end') ru = d.ru+' '+cnt[s.type];
+    if(s.type==='solo'){ ru = 'Соло: '+SOLO[s.solo||'guitar'].ru.toLowerCase(); en = SOLO[s.solo||'guitar'].en+' Solo'; }
+    return {ru,en,n:cnt[s.type]};
+  });
+}
+function instPhrase(id){
+  const p=primary(), s=secondary();
+  if(p && p.inst[id]) return p.inst[id];
+  if(s && s.inst[id]) return s.inst[id];
+  return INST[id].en;
+}
+function baseInst(){
+  const p=primary(), s=secondary(); const set=new Set();
+  if(p) Object.keys(p.inst).forEach(k=>set.add(k));
+  if(s) Object.keys(s.inst).slice(0,2).forEach(k=>set.add(k));
+  return set;
+}
+function isHipHop(){ return state.genres.some(g=>G[g].g==='hiphop'); }
+function anyRap(){
+  if(state.vocal.delivery==='rap') return true;
+  return state.sections.some(s=>effVox(s) && s.delivery==='rap');
+}
+
+/* ================= APPLY GENRE DEFAULTS ================= */
+function applyGenreDefaults(){
+  const p=primary(), s=secondary();
+  if(!p){
+    if(!state.instTouched) state.inst=[];
+    if(!state.vocTouched){ state.vocal.type=null; state.vocal.delivery=''; state.vocal.timbre=[]; }
+    if(!state.structTouched){ state.sections=[]; openSet.clear(); }
+    if(!state.exTouched) state.exclude=[];
+    if(!state.texTouched) state.tex=[];
+    if(!state.bpmTouched) state.bpm=112;
+    return;
+  }
+  if(!state.instTouched) state.inst = [...baseInst()];
+  if(!state.bpmTouched) state.bpm = p.bpm[2];
+  if(!state.vocTouched){
+    state.vocal.type = p.voc.type; state.vocal.delivery = p.voc.delivery; state.vocal.timbre=[...p.voc.timbre];
+  }
+  if(!state.structTouched) loadTemplate(p.tmpl, false);
+  if(!state.exTouched){ const ex=new Set([...(p.ex||[]), ...((s&&s.ex)||[])]); state.exclude=[...ex]; }
+  if(!state.texTouched){ state.tex=[...(p.tex||[])]; }
+}
+function loadTemplate(id, touched){
+  const p = primary();
+  state.sections = TEMPLATES[id].seq.map(t=>{
+    const x = mkSec(t);
+    if(t==='hook' && p && p.hookSung) x.delivery='sung';
+    return x;
+  });
+  if(state.vocal.type==='duet') assignDuet();
+  openSet.clear();
+  if(touched) state.structTouched=true;
+}
+function assignDuet(){
+  let v=0;
+  state.sections.forEach(s=>{ if(s.type==='verse'){ v++; s.singer = v%2 ? 'f':'m'; } else s.singer='both'; });
+}
+
+/* ================= BUILD: STYLE ================= */
+function buildStyle(){
+  const out=[]; const p=primary(), s=secondary(); const V=state.vocal;
+  if(p){ out.push(tk(p.en,1,TIPS.genre)); if(s){ const f=tk('with '+s.fusion,2,TIPS.fusion); f.j=' '; out.push(f); } }
+  state.moods.forEach(m=>out.push(tk(MOODS[m][1],2,TIPS.mood)));
+  if(p && state.useBpm) out.push(tk(state.bpm+' BPM',3,TIPS.bpm));
+  if(state.key) out.push(tk(state.key,3,TIPS.key));
+  // vocals
+  if(V.type && V.type!=='none'){
+    V.timbre.forEach(t=>out.push(tk(TIMBRE[t][1],2,TIPS.timbre)));
+    out.push(tk(VTYPE[V.type].style,2,TIPS.vtype));
+    if(V.delivery) out.push(tk(DELIV[V.delivery].style,DELIV[V.delivery].lvS,TIPS.deliv));
+    if(state.guards.single && (V.type==='female'||V.type==='male')) out.push(tk('single lead vocal throughout',2,TIPS.single));
+    if(V.lang==='ru'){ out.push(tk('sung in Russian',2,TIPS.lang)); out.push(tk('clear diction',3,TIPS.diction)); }
+    if(V.lang==='en') out.push(tk('sung in English',2,TIPS.lang));
+    if(V.harmonies && state.sections.some(x=>['chorus','hook'].includes(x.type)) && !(p && /harmonies/.test(p.arr))) out.push(tk('layered harmonies in the chorus',2,TIPS.harm));
+    V.verbs.forEach(v=>out.push(tk(VERBS[v].en,2,TIPS.verb)));
+  } else if(V.type==='none') out.push(tk(VTYPE.none.style,2,'Явное «инструментал» в Style плюс вокал в Exclude.'));
+  // instruments ordered by slot
+  const order = ['drums','guitars','bass','other'];
+  const sel = state.inst.filter(i=>INST[i]).sort((a,b)=>{
+    const sa=order.indexOf(SLOT[INST[a].cat]), sb=order.indexOf(SLOT[INST[b].cat]);
+    if(sa!==sb) return sa-sb;
+    return INST_CATS.findIndex(c=>c[0]===INST[a].cat) - INST_CATS.findIndex(c=>c[0]===INST[b].cat);
+  });
+  sel.forEach((id,i)=>out.push(tk(instPhrase(id), i<5?2:3, i<5?TIPS.inst:TIPS.instMany)));
+  // arrangement
+  const VOCRX=/vocal|sung|singalong|ad-libs|harmonies/i;
+  const keep = part => V.type!=='none' || !VOCRX.test(part);
+  if(p) p.arr.split(', ').filter(keep).forEach(part=>out.push(tk(part,2,TIPS.arr)));
+  if(V.type && V.type!=='none' && state.guards.under) out.push(tk('band plays under the vocal',2,TIPS.under));
+  // production
+  if(p){ const chips=state.prod.map(k=>PROD[k].en.toLowerCase()); p.prod.split(', ').filter(keep).filter(part=>!chips.some(c=>c.includes(part.toLowerCase()))).forEach(part=>out.push(tk(part,2,TIPS.prod))); }
+  state.prod.forEach(k=>out.push(tk(PROD[k].en,PROD[k].lv,TIPS.prod)));
+  state.tex.forEach(k=>out.push(tk(TEX[k][1],3,TIPS.tex)));
+  // ending
+  const outro = state.sections.find(x=>x.type==='outro');
+  if(outro && outro.ending && outro.ending!=='none') out.push(tk(ENDINGS[outro.ending].style, ENDINGS[outro.ending].lv===1?2:ENDINGS[outro.ending].lv, TIPS.end));
+  else if(p) out.push(tk(p.end,2,TIPS.end));
+  const seen=new Set(); const uniq=out.filter(x=>{ const k=x.t.toLowerCase(); if(seen.has(k)) return false; seen.add(k); return true; });
+  const text = uniq.map((x,i)=>(i?(x.j!==undefined?x.j:', '):'')+x.t).join('');
+  return {tokens:uniq, text};
+}
+
+/* ================= BUILD: SECTION TAG ================= */
+function sectionTag(s, lab){
+  const d = SEC[s.type];
+  if(d.noDesc) return {name:'End', nameLv:2, nameTip:TIPS.endtag, items:[], text:'[End]', words:0, long:false};
+  const vox = effVox(s); const items=[];
+  if(s.type==='solo') items.push(tk(SOLO[s.solo].en.toLowerCase()+' solo',1,TIPS.solo));
+  if(vox && state.vocal.type==='duet') items.push(tk(SINGER[s.singer||'both'].en,1,TIPS.singer));
+  if(vox && s.delivery){ const D=DELIV[s.delivery]; items.push(tk(D.tag,D.lvT,D.lvT>=3?TIPS.itemDeliv3:TIPS.itemDeliv)); }
+  if(s.energy===1) items.push(tk(ENERGY[1].en,2,TIPS.energy));
+  if(s.energy===3) items.push(tk(ENERGY[3].en,2,TIPS.energy));
+  s.arr.forEach(a=>{ if(ARR[a]) items.push(tk(ARR[a].en,ARR[a].lv,TIPS.itemArr)); });
+  if(s.type==='outro' && s.ending && s.ending!=='none') items.push(tk(ENDINGS[s.ending].en,ENDINGS[s.ending].lv,TIPS.end));
+  const c=(s.custom||'').trim();
+  if(c) items.push(tk(c, hasCyr(c)?4:2, hasCyr(c)?TIPS.customRu:TIPS.custom));
+  const useDesc = s.desc && items.length>0;
+  let name = lab.en, nameLv, nameTip;
+  if(s.type==='solo'){
+    if(useDesc){ name='Instrumental Break'; nameLv=1; nameTip=TIPS.secD; }
+    else { nameLv=2; nameTip=TIPS.solo; }
+  } else if(useDesc){ nameLv=d.lvD; nameTip = d.lvD>=3?TIPS.sec3:TIPS.secD; }
+  else { nameLv=d.lvB; nameTip = d.lvB>=3?TIPS.sec3:TIPS.secB; }
+  const shown = useDesc ? items : [];
+  const words = shown.reduce((a,x)=>a+x.t.split(/[\s,]+/).filter(Boolean).length,0);
+  const long = words>8;
+  if(long){ shown.forEach(x=>{ if(x.lv<3){ x.lv=3; x.tip=TIPS.long; } }); }
+  const text = '['+name+(shown.length?' - '+shown.map(x=>x.t).join(', '):'')+']';
+  return {name, nameLv, nameTip, items:shown, text, words, long};
+}
+
+/* ================= BUILD: LYRICS ================= */
+const PH = {
+  verse:n=>'Куплет '+n+': ваш текст, 4–8 строк, до 12–15 слогов в строке',
+  pre:()=>'Предприпев: 2–4 строки',
+  chorus:(n)=> n===1 ? 'Припев: ваш текст полностью' : 'Припев: тот же текст полностью — не только метка',
+  post:()=>'Постприпев: короткая повторяющаяся фраза',
+  hook:(n)=> n===1 ? 'Хук: 2–4 цепкие строки' : 'Хук: тот же текст полностью',
+  bridge:()=>'Бридж: 2–4 строки, новая мысль',
+  beat:()=>'Текст после смены бита',
+  outro:()=>'Аутро: 1–2 строки',
+  intro:()=>'Интро: 1–2 строки или пусто',
+  def:()=>'Текст секции'
+};
+function buildLyrics(){
+  const lines=[]; const labs=labels(); const V=state.vocal;
+  if(V.type && V.type!=='none'){ const vt=VTYPE[V.type]; lines.push({tokens:[tk(vt.tag, vt.lv, vt.lv===1?TIPS.vtag:TIPS.vtag2)]}); lines.push({blank:true}); }
+  let verseN=0;
+  state.sections.forEach((s,i)=>{
+    const st = sectionTag(s, labs[i]);
+    lines.push({sec:st, uid:s.uid});
+    // sfx
+    if(s.type==='intro' || s.type==='outro'){
+      Object.entries(state.sfx).forEach(([k,pos])=>{ if(pos===s.type) lines.push({tokens:[tk('['+SFX[k].en+']',SFX[k].lv,SFX[k].lv>=4?TIPS.sfx4:TIPS.sfx3)]}); });
+    }
+    if(effVox(s)){
+      if(s.type==='verse') verseN++;
+      const f = PH[s.type]||PH.def;
+      lines.push({ph: f(s.type==='verse'?verseN:labs[i].n)});
+    }
+    if(s.type!=='end') lines.push({blank:true});
+  });
+  // text
+  const textLines=[];
+  lines.forEach(l=>{
+    if(l.blank) textLines.push('');
+    else if(l.ph!==undefined){ if(state.showPh) textLines.push('>>> '+l.ph+' <<<'); }
+    else if(l.sec) textLines.push(l.sec.text);
+    else textLines.push(l.tokens.map(t=>t.t).join(' '));
+  });
+  let text = textLines.join('\n').replace(/\n{3,}/g,'\n\n').trim();
+  const tagChars = lines.filter(l=>l.sec||l.tokens).map(l=>(l.sec?l.sec.text:l.tokens.map(t=>t.t).join(' ')).length+1).reduce((a,b)=>a+b,0);
+  return {lines, text, tagChars};
+}
+
+/* ================= BUILD: EXCLUDE ================= */
+function buildExclude(){
+  const V=state.vocal; const auto=[];
+  if(V.type==='none') auto.push(['vocals','Без вокала'],['backing vocals','Без вокала'],['humming','Без вокала']);
+  if(V.type && V.type!=='none' && state.guards.norap && !anyRap() && !isHipHop()) auto.push(['rap','Защита от внезапного рэпа']);
+  if(state.guards.opposite){ if(V.type==='female') auto.push(['male vocals','Защита от второго голоса']); if(V.type==='male') auto.push(['female vocals','Защита от второго голоса']); }
+  const seen=new Set(); const list=[];
+  auto.forEach(([t,why])=>{ if(!seen.has(t)){ seen.add(t); list.push({t,auto:true,why}); } });
+  state.exclude.forEach(t=>{ if(!seen.has(t)){ seen.add(t); list.push({t,auto:false}); } });
+  return {list, text:list.map(x=>x.t).join(', ')};
+}
+
+/* ================= CHECKS ================= */
+function buildChecks(S,L,E){
+  const C=[]; const p=primary(), s=secondary(); const V=state.vocal;
+  const add=(sev,html,fix)=>C.push({sev,html,fix});
+  if(!p && !state.sections.length && !state.inst.length && !V.type) return [{sev:'tip',html:'Начните со стиля в шаге 1. Он подставит базовый промт, голос, инструменты и шаблон структуры — дальше всё можно поменять. До этого промт пустой.'}];
+  if(!p) add('tip','Выберите стиль в шаге 1 — с него начинается промт: ведущий жанр стоит первым и это самый надёжный элемент.');
+  if(S.text.length>1000) add('err',`Style длиннее лимита: <b>${S.text.length}</b> из 1000 символов. Suno молча обрежет хвост — уберите часть инструментов или продакшна.`);
+  else if(S.text.length>850) add('warn',`Style близок к лимиту: ${S.text.length}/1000. Всё важное уже стоит в начале — хвост режется первым.`);
+  if(p && s){
+    if(Math.abs(p.energy-s.energy)>=3) add('warn',`«${p.ru}» и «${s.ru}» сильно расходятся по энергии — v6 может выдать кашу. Попробуйте v6-wild или оставьте один стиль.`);
+    if(state.useBpm && (state.bpm<s.bpm[0]-4 || state.bpm>s.bpm[1]+4)) add('tip',`Темп ${state.bpm} BPM вне типичного диапазона «${s.ru}» (${s.bpm[0]}–${s.bpm[1]}). Примесь будет звучать в темпе ведущего стиля — это нормально, но черты второго стиля могут смазаться.`);
+  }
+  MOOD_CONFLICT.forEach(([a,b])=>{ if(state.moods.includes(a)&&state.moods.includes(b)) add('warn',`Настроения «${MOODS[a][0]}» и «${MOODS[b][0]}» спорят друг с другом — получится не гибрид, а каша.`); });
+  // structure
+  const types = state.sections.map(x=>x.type);
+  if(!state.sections.length) add('tip','В структуре нет секций — выберите шаблон или добавьте хотя бы куплет и припев.');
+  if(state.sections.length && !types.includes('outro')) add('warn','Нет секции Outro — без неё трек часто обрывается или неловко затухает.', {act:'add-outro',ru:'Добавить аутро'});
+  if(V.type && V.type!=='none' && state.sections.length && !types.includes('chorus') && !types.includes('hook')) add('tip','Нет припева или хука — v6 может слить секции в одну. Для вокального трека припев — главный якорь структуры.');
+  const intro = state.sections.find(x=>x.type==='intro');
+  if(intro && !(intro.arr||[]).includes('short')) add('tip','v6 склонна к длинным интро по 30–40 секунд. Добавьте интро указание «Коротко» или уберите интро совсем.');
+  const labs = labels();
+  state.sections.forEach((x,i)=>{
+    const st = sectionTag(x, labs[i]);
+    if(st.long) add('warn',`Метка «${labs[i].ru}» длиннее 8 слов — растёт риск, что её споют. Уберите одно из указаний.`);
+    if(hasCyr(x.custom||'')) add('err',`В «${labs[i].ru}» своё указание на кириллице — теги работают только на английском, его споют.`);
+    (x.arr||[]).forEach(a=>{ const A=ARR[a]; if(A && A.req && !A.req.some(r=>state.inst.includes(r))) add('warn',`В «${labs[i].ru}» стоит «${A.ru.toLowerCase()}», а в инструментах нет ${A.reqRu}. Метка и Style должны совпадать — иначе v6 прорежет аранжировку.`,{act:'add-inst',id:A.add,ru:'Добавить в инструменты: '+INST[A.add].ru.toLowerCase()}); });
+    if(x.type==='solo'){ const So=SOLO[x.solo]; if(!So.req.some(r=>state.inst.includes(r))) add('warn',`Соло на инструменте «${So.ru.toLowerCase()}», а его нет в Style. Добавьте инструмент, чтобы метка и Style совпадали.`,{act:'add-inst',id:So.add,ru:'Добавить в инструменты: '+INST[So.add].ru.toLowerCase()}); }
+  });
+  // vocal
+  const heavy = (k)=> DELIV[k] && DELIV[k].heavy;
+  const usedHeavy = heavy(V.delivery) || state.sections.some(x=>effVox(x)&&heavy(x.delivery));
+  if(V.type!=='none' && usedHeavy && !state.genres.some(g=>['metal','altrock','poppunk','phonk'].includes(g))) add('warn','Экстремальная подача (крик, скрим, гроул) без тяжёлого жанра в Style почти игнорируется — тег должен быть совместим с жанром.');
+  if(usedHeavy) add('tip','Для экстремального вокала часть тестеров советует модель v6-wild — оценки по тяжёлым жанрам расходятся.');
+  if(V.type==='none') add('tip','Инструментал: вокал, бэки и мычание автоматически ушли в Exclude. Если в Suno включить переключатель Instrumental, поле Lyrics может скрыться — чтобы метки структуры работали, оставьте его выключенным и вставьте в Lyrics только метки. Voices на инструменталах в v6 использовать нельзя.');
+  if(V.lang==='ru' && V.type && V.type!=='none') add('tip','Русский текст: пишите «ё»; трудные слова — как слышатся («замаразки») или по слогам через дефис; строки короче, чем кажется. Диакритика и капс на ударной гласной в тестах сообщества не сработали.');
+  // instruments
+  const n = state.inst.length;
+  if(n>5) add('warn',`Выбрано ${n} инструментов. Больше 4–5 — v6 может проредить аранжировку; лишние помечены уровнем 3.`);
+  if(p && n===0) add('tip','Инструменты не выбраны — v6 додумает аранжировку сама. Хотя бы барабаны и бас задают трек надёжнее.');
+  // exclude
+  if(E.list.length>10) add('err',`В Exclude ${E.list.length} пунктов — держите не больше 10, категориями.`);
+  E.list.forEach(x=>{ const f=EXCL_CONFLICT[x.t]; if(f && state.inst.some(f)) add('warn',`«${EXCL_RU[x.t]||x.t}» одновременно в Exclude и в инструментах — противоречие. Уберите одно из двух.`); });
+  if(E.list.some(x=>x.t==='vocals') && V.type!=='none') add('warn','«Вокал» в Exclude при вокальном треке — противоречие.');
+  // duration
+  const dur = state.sections.reduce((a,x)=>a+secDur(x),0);
+  if(dur>480) add('err',`Оценочная длина ${fmtTime(dur)} — больше 8 минут, максимума одной генерации v6.`);
+  // lyrics budget
+  if(V.type && V.type!=='none' && L.tagChars>0){ const left = 3000-L.tagChars; add('ok',`Метки занимают ${L.tagChars} символов. Под текст остаётся ~${Math.max(0,left)} до практического предела в 3000 (лимит поля — 5000, но дальше v6 начинает пропускать секции).`); }
+  if(S.text.length && S.text.length<=1000 && C.filter(x=>x.sev==='err'||x.sev==='warn').length===0) add('ok','Противоречий между Style, метками и Exclude не найдено.');
+  return C;
+}
+
+/* ================= RENDER: STEP 1 ================= */
+function renderGenres(){
+  $('#gtabs').innerHTML = GROUPS.map(([k,r])=>`<button data-gtab="${k}" class="${state.gtab===k?'on':''}">${r}</button>`).join('');
+  const list = G_ORDER.filter(id=>state.gtab==='all'||G[id].g===state.gtab);
+  $('#ggrid').innerHTML = list.map(id=>{
+    const g=G[id]; const i=state.genres.indexOf(id);
+    const bars=[1,2,3,4,5].map(n=>`<span class="${n<=g.energy?'on':''}" style="height:${4+n*2}px"></span>`).join('');
+    return `<button class="gcard ${i===0?'s1':i===1?'s2':''}" data-genre="${id}" aria-pressed="${i>=0}">
+      <span class="bdg">${i+1}</span>
+      <div class="gn">${g.ru}</div><div class="ge">${esc(g.en)}</div>
+      <div class="gm"><span>${g.bpm[0]}–${g.bpm[1]} BPM</span>${g.model==='v6-wild'?'<span class="wild">v6-wild</span>':`<span class="ebar" title="Энергия">${bars}</span>`}</div>
+    </button>`;
+  }).join('');
+  const p=primary(), s=secondary();
+  $('#selbar').innerHTML = p ? `<span class="pill p1">1 · ведущий</span><b>${p.ru}</b>${s?`<span class="pill p2">2 · примесь</span><b>${s.ru}</b>`:'<span>Можно добавить второй стиль как примесь</span>'}
+     <span class="sp"></span>${s?`<button class="mini" data-act="swapg">${IC.swap}Поменять</button>`:''}<button class="mini" data-act="clearg">${IC.x}Сбросить</button>`
+    : '<span>Стиль не выбран. Нажмите на карточку — первый выбранный станет ведущим, второй — примесью.</span>';
+  $('#moodCnt').innerHTML = `<b>${state.moods.length}</b> из 2`;
+  $('#moods').innerHTML = Object.entries(MOODS).map(([k,[ru,en]])=>`<button class="chip ${state.moods.includes(k)?'on':''}" data-mood="${k}">${ru} <span class="en">${en}</span></button>`).join('');
+}
+function renderTempo(){
+  $('#bpm').value = state.bpm; $('#bpmVal').textContent = state.bpm; $('#useBpm').checked = state.useBpm;
+  const z=(lo,hi)=>({left:((lo-50)/150*100)+'%',width:((hi-lo)/150*100)+'%'});
+  const p=primary(), s=secondary();
+  const z1=$('#zone1'), z2=$('#zone2');
+  if(p){ const a=z(p.bpm[0],p.bpm[1]); z1.style.display='block'; z1.style.left=a.left; z1.style.width=a.width; } else z1.style.display='none';
+  if(s){ const a=z(s.bpm[0],s.bpm[1]); z2.style.display='block'; z2.style.left=a.left; z2.style.width=a.width; } else z2.style.display='none';
+  $('#key').innerHTML = '<option value="">не указывать</option>'+KEYS.map(k=>`<option ${state.key===k?'selected':''}>${k}</option>`).join('');
+  $('#tempoNote').textContent = p ? `Заливка — типичный темп «${p.ru}»${s?`, пунктир — «${s.ru}»`:''}.` : '';
+  $('#bpmVal').parentElement.style.opacity = state.useBpm?1:.45;
+}
+
+/* ================= RENDER: STEP 2 ================= */
+function renderStructure(){
+  $('#tpls').innerHTML = Object.entries(TEMPLATES).map(([k,t])=>`<button class="chip" data-tpl="${k}">${t.ru}</button>`).join('');
+  $('#palette').innerHTML = SEC_ORDER.map(k=>`<button class="pal" data-add="${k}" style="--c:${SEC[k].c}"><i></i>${SEC[k].ru}${IC.plus}</button>`).join('');
+  renderTimeline(); renderCards();
+}
+let PPB = 0; // пикселей на такт на ленте
+const END_W = 30, MIN_W = 26, MAX_BARS = 64;
+function fitPPB(){
+  const W = ($('#arrScroll') && $('#arrScroll').clientWidth) || 700;
+  const bars = state.sections.filter(s=>s.type!=='end').reduce((a,s)=>a+(s.bars||0),0) || 1;
+  const fixed = state.sections.some(s=>s.type==='end') ? END_W : 0;
+  return Math.max(1, Math.min((W - fixed - 4)/bars, 40));
+}
+function blockW(s){ return s.type==='end' ? END_W : Math.max(Math.round((s.bars||0)*PPB), MIN_W); }
+function renderRuler(){
+  const widths = state.sections.map(blockW); const segs=[]; let x=0, t=0;
+  state.sections.forEach((s,i)=>{ const d=secDur(s); segs.push({x0:x,w:widths[i],t0:t,d}); x+=widths[i]; t+=d; });
+  const pxPerSec = PPB*(state.bpm||110)/240;
+  const step = [5,10,15,20,30,60,120].find(v=>v*pxPerSec>=56) || 120;
+  let html='';
+  for(let tt=0; tt<=t+0.01 && segs.length; tt+=step){
+    const sg = segs.find(g=>g.d>0 && tt>=g.t0 && tt<=g.t0+g.d) || segs[segs.length-1];
+    const xx = sg.d ? sg.x0 + (tt-sg.t0)/sg.d*sg.w : sg.x0;
+    html += `<i style="left:${Math.round(xx)}px">${fmtTime(tt)}</i>`;
+  }
+  $('#ruler').innerHTML = html; $('#ruler').style.width = x+'px';
+}
+function updateTlMeta(){
+  const total = state.sections.reduce((a,s)=>a+secDur(s),0);
+  $('#tlMeta').innerHTML = `<span>Секций: <b>${state.sections.length}</b> · вокальных: <b>${state.sections.filter(effVox).length}</b></span><span>Оценочная длина <b>≈ ${fmtTime(total)}</b> при ${state.bpm} BPM${total>120?' · включите Max Mode':''}</span>`;
+}
+function renderTimeline(keepZoom){
+  const arr = $('.arr'); if(arr) arr.style.display = state.sections.length ? '' : 'none';
+  if(!keepZoom || !PPB) PPB = fitPPB();
+  const labs=labels();
+  $('#timeline').innerHTML = state.sections.map((s,i)=>{
+    const d=secDur(s); const end=s.type==='end';
+    return `<div class="tl ${end?'end':''} ${openSet.has(s.uid)?'focus':''}" data-uid="${s.uid}" ${end?'data-fixed="1"':''} tabindex="0" role="button" aria-label="${esc(labs[i].ru)}${end?'':', '+s.bars+' тактов'}" style="--c:${SEC[s.type].c};width:${blockW(s)}px" title="${esc(labs[i].ru)}${end?'':` · ${s.bars} тактов · ≈${fmtTime(d)}`}">
+      <div class="tlb">${end?'■':`<span class="tln">${esc(labs[i].ru)}</span><small>${s.bars} т · ${fmtTime(d)}</small>`}${effVox(s)?'<span class="vx"></span>':''}</div>
+      ${end?'':'<div class="rz" data-rz title="Потяните, чтобы изменить длину · с Shift — шаг в 1 такт"></div>'}
+    </div>`;
+  }).join('');
+  renderRuler(); updateTlMeta();
+}
+function tagHTML(st){
+  const n = `<span class="tk l${st.nameLv}" title="${esc(LVNAME[st.nameLv]+'. '+st.nameTip)}">[${esc(st.name)}</span>`;
+  const it = st.items.map(x=>`<span class="tk l${x.lv}" title="${esc(LVNAME[x.lv]+'. '+x.tip)}">${esc(x.t)}</span>`).join('<span class="sep">, </span>');
+  return n + (st.items.length?'<span class="sep"> - </span>'+it:'') + `<span class="tk l${st.nameLv}">]</span>`;
+}
+function renderCards(){
+  const labs=labels();
+  if(!state.sections.length){ $('#cards').innerHTML='<div class="empty">Структура пуста. Выберите шаблон или добавьте секции кнопками выше.</div>'; return; }
+  $('#cards').innerHTML = state.sections.map((s,i)=>{
+    const d=SEC[s.type]; const st=sectionTag(s,labs[i]); const open=openSet.has(s.uid);
+    const vox = effVox(s);
+    const meta = d.noDesc ? 'завершающая метка' : `${s.bars} тактов · ≈${fmtTime(secDur(s))}${vox?' · вокал':''}`;
+    let body='';
+    if(!d.noDesc){
+      body += `<div class="fld"><div class="row"><label class="switch"><input type="checkbox" data-f="desc" ${s.desc?'checked':''}><span>Описательная метка <span class="lvd l1" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--l1);margin:0 2px 1px 4px"></span>уровень 1</span></label>
+        ${state.vocal.type!=='none' && !d.noVox?`<label class="switch"><input type="checkbox" data-f="vox" ${vox?'checked':''}><span>Вокал в секции</span></label>`:''}</div></div>`;
+      if(s.type==='solo') body += `<div class="fld"><label>Инструмент соло</label><div class="seg">${Object.entries(SOLO).map(([k,v])=>`<button data-f="solo" data-v="${k}" class="${s.solo===k?'on':''}">${v.ru}</button>`).join('')}</div></div>`;
+      if(s.type==='outro') body += `<div class="fld"><label>Финал</label><div class="seg">${Object.entries(ENDINGS).map(([k,v])=>`<button data-f="ending" data-v="${k}" class="${s.ending===k?'on':''}">${v.ru}</button>`).join('')}</div></div>`;
+      body += `<div class="fld"><label>Энергия</label><div class="seg">${[1,2,3].map(e=>`<button data-f="energy" data-v="${e}" class="${s.energy===e?'on':''}">${ENERGY[e].ru}</button>`).join('')}</div></div>`;
+      body += `<div class="fld"><label>Аранжировка · до 2</label><div class="chips">${ARR_ORDER.map(a=>`<button class="chip ${s.arr.includes(a)?'on':''}" data-f="arr" data-v="${a}"><span class="lvd l${ARR[a].lv}"></span>${ARR[a].ru} <span class="en">${ARR[a].en}</span></button>`).join('')}</div></div>`;
+      body += `<div class="fld"><label>Своё указание · по-английски, 1–3 слова</label><input class="inp" data-f="custom" value="${esc(s.custom||'')}" placeholder="например: drums keep driving" maxlength="60"></div>`;
+      body += `<div class="fld"><label>Длина</label><div class="lenstep"><button data-f="barsm" aria-label="Короче">−</button><b data-lenlbl>${s.bars} тактов</b><span data-lentime>≈${fmtTime(secDur(s))}</span><button data-f="barsp" aria-label="Длиннее">+</button></div><p class="note">Или потяните за правый край блока на ленте выше. Такты нужны только для оценки времени — Suno их не считает, в промт длина не попадает.</p></div>`;
+    } else body = '<p class="note">[End] ставится последней строкой в паре с [Outro] — помогает трек закончить.</p>';
+    return `<div class="scard ${open?'open':''}" data-uid="${s.uid}" style="--c:${d.c}">
+      <div class="sc-h">
+        <button class="grip" data-grip aria-label="Перетащить — или стрелки вверх/вниз">${IC.grip}</button>
+        <div class="sc-name"><b>${esc(labs[i].ru)}</b><span data-meta>${meta}</span></div>
+        <code class="sc-tag" data-tagprev>${tagHTML(st)}</code>
+        <div class="sc-act">
+          <button data-act="up" title="Выше" ${i===0?'disabled style="opacity:.3"':''}>${IC.up}</button>
+          <button data-act="down" title="Ниже" ${i===state.sections.length-1?'disabled style="opacity:.3"':''}>${IC.down}</button>
+          <button data-act="dup" title="Копировать">${IC.dup}</button>
+          <button data-act="del" class="del" title="Удалить">${IC.del}</button>
+          <button data-act="toggle" class="tog" title="Настроить" aria-expanded="${open}">${IC.chev}</button>
+        </div>
+      </div>
+      <div class="sc-b">${body}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ================= RENDER: STEP 3 ================= */
+function renderVocal(){
+  const V=state.vocal;
+  $('#vtypes').innerHTML = Object.entries(VTYPE).map(([k,v])=>`<button class="vt ${V.type===k?'on':''}" data-vtype="${k}"><b>${v.ru}</b><span>${esc(v.sub)}</span></button>`).join('');
+  $('#vocalBody').style.display = (!V.type || V.type==='none') ? 'none':'block';
+  const pg=primary();
+  $('#vocNote').textContent = !V.type ? 'Выберите тип голоса — или стиль в шаге 1, он подставит голос сам.' : (pg && !state.vocTouched ? `Голос, тембр и манера подставлены из стиля «${pg.ru}». Измените, если нужно.` : '');
+  $('#timbreCnt').innerHTML = `<b>${V.timbre.length}</b> из 2`;
+  $('#timbre').innerHTML = Object.entries(TIMBRE).map(([k,[ru,en]])=>`<button class="chip ${V.timbre.includes(k)?'on':''}" data-timbre="${k}">${ru} <span class="en">${en}</span></button>`).join('');
+  $('#deliv').innerHTML = Object.entries(DELIV).map(([k,d])=>`<button class="chip ${V.delivery===k?'on':''}" data-deliv="${k}"><span class="lvd l${d.lvS}"></span>${d.ru}</button>`).join('');
+  const labs=labels();
+  const rows = state.sections.map((s,i)=>({s,i})).filter(({s})=>effVox(s));
+  $('#parts').innerHTML = rows.length ? rows.map(({s,i})=>`<div class="prt" data-uid="${s.uid}" style="--c:${SEC[s.type].c}">
+      <div class="pn"><i></i>${esc(labs[i].ru)}</div>
+      <select class="sel" data-pdeliv><option value="">как для всего вокала${V.delivery?' · '+DELIV[V.delivery].ru.toLowerCase():''}</option>${Object.entries(DELIV).map(([k,d])=>`<option value="${k}" ${s.delivery===k?'selected':''}>${d.ru} — ${d.tag}</option>`).join('')}</select>
+      ${V.type==='duet'?`<div class="seg">${Object.entries(SINGER).map(([k,v])=>`<button data-psinger="${k}" class="${s.singer===k?'on':''}">${v.ru}</button>`).join('')}</div>`:'<span></span>'}
+    </div>`).join('') : '<div class="empty">В структуре нет вокальных секций.</div>';
+  $('#verbs').innerHTML = Object.entries(VERBS).map(([k,v])=>`<button class="chip ${V.verbs.includes(k)?'on':''}" data-verb="${k}">${v.ru} <span class="en">${v.en}</span></button>`).join('') + `<button class="chip ${V.harmonies?'on':''}" data-harm>Гармонии в припеве <span class="en">layered harmonies</span></button>`;
+  $('#lang').innerHTML = Object.entries(LANG).map(([k,v])=>`<button class="chip ${V.lang===k?'on':''}" data-lang="${k}">${v.ru}</button>`).join('');
+  const GU = [
+    ['single','Один ведущий голос','single lead vocal throughout — против самовольного дуэта', V.type==='female'||V.type==='male'],
+    ['norap','Запретить внезапный рэп','rap → Exclude, если рэп не нужен', !!V.type && V.type!=='none'],
+    ['under','Группа играет под вокалом','против «группа стихает под голосом»', !!V.type && V.type!=='none'],
+    ['opposite','Запретить голос другого пола','male / female vocals → Exclude', V.type==='female'||V.type==='male']
+  ];
+  $('#guards').innerHTML = GU.map(([k,ru,sub,ok])=>`<label class="switch" style="${ok?'':'opacity:.4;pointer-events:none'}"><input type="checkbox" data-guard="${k}" ${state.guards[k]&&ok?'checked':''}><span>${ru}<small>${sub}</small></span></label>`).join('');
+}
+
+/* ================= RENDER: STEP 4 ================= */
+function renderInst(){
+  const base = baseInst();
+  $('#instCnt').innerHTML = `<b class="${state.inst.length>5?'':'cnt-ok'}">${state.inst.length}</b> выбрано · разумно до 4–5`;
+  $('#instCats').innerHTML = INST_CATS.map(([cat,ru])=>`<div class="icat"><h4>${ru}</h4><div class="chips">${Object.entries(INST).filter(([,v])=>v.cat===cat).map(([k,v])=>`<button class="chip ${state.inst.includes(k)?'on':''}" data-inst="${k}" title="${esc(instPhrase(k))}">${base.has(k)?'<span class="base" title="Из базы стиля"></span>':''}${v.ru}</button>`).join('')}</div></div>`).join('');
+  $('#prodCnt').innerHTML = `<b>${state.prod.length}</b> из 3`;
+  $('#prod').innerHTML = Object.entries(PROD).map(([k,v])=>`<button class="chip ${state.prod.includes(k)?'on':''}" data-prod="${k}"><span class="lvd l${v.lv}"></span>${v.ru} <span class="en">${v.en}</span></button>`).join('');
+  $('#tex').innerHTML = Object.entries(TEX).map(([k,[ru,en]])=>`<button class="chip ${state.tex.includes(k)?'on':''}" data-tex="${k}">${ru} <span class="en">${en}</span></button>`).join('');
+  const hasIntro = state.sections.some(s=>s.type==='intro'), hasOutro = state.sections.some(s=>s.type==='outro');
+  $('#sfx').innerHTML = `<div class="chips">${Object.entries(SFX).map(([k,v])=>`<button class="chip ${state.sfx[k]?'on':''}" data-sfx="${k}"><span class="lvd l${v.lv}"></span>${v.ru} <span class="en">[${v.en}]</span></button>`).join('')}</div>` +
+    Object.keys(state.sfx).map(k=>`<div class="sfxr"><span style="font-size:13px">${SFX[k].ru} <code style="font-family:var(--f-mono);font-size:12px;color:var(--ink-3)">[${SFX[k].en}]</code> ставим в</span><div class="seg"><button data-sfxpos="${k}" data-v="intro" class="${state.sfx[k]==='intro'?'on':''}" ${hasIntro?'':'disabled style="opacity:.4"'}>Интро</button><button data-sfxpos="${k}" data-v="outro" class="${state.sfx[k]==='outro'?'on':''}" ${hasOutro?'':'disabled style="opacity:.4"'}>Аутро</button></div></div>`).join('');
+  const E = buildExclude();
+  $('#exCnt').innerHTML = `<b style="color:${E.list.length>10?'var(--err)':'var(--ink)'}">${E.list.length}</b> из 10`;
+  const autoSet = new Set(E.list.filter(x=>x.auto).map(x=>x.t));
+  $('#excl').innerHTML = EXCL_KEYS.map(k=> autoSet.has(k)
+      ? `<span class="chip on locked" title="${esc(E.list.find(x=>x.t===k).why)}">авто · ${EXCL_RU[k]} <span class="en">${k}</span></span>`
+      : `<button class="chip ${state.exclude.includes(k)?'on':''}" data-excl="${k}">${EXCL_RU[k]} <span class="en">${k}</span></button>`).join('');
+}
+
+/* ================= RENDER: OUTPUT ================= */
+function tokHTML(t){ return `<span class="tk l${t.lv}" title="${esc(LVNAME[t.lv]+'. '+t.tip)}">${esc(t.t)}</span>`; }
+let LAST = {};
+function renderOutput(){
+  const S=buildStyle(), L=buildLyrics(), E=buildExclude(); LAST={S,L,E};
+  const box=$('#pbox'); box.classList.toggle('nolv', !state.showLv);
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on', b.dataset.tab===state.tab));
+  $('#tcStyle').textContent = S.text.length+'/1000'; $('#tcStyle').parentElement.classList.toggle('over', S.text.length>1000);
+  $('#tcLyr').textContent = L.text.length+' симв.';
+  $('#tcEx').textContent = E.list.length+'/10'; $('#tcEx').parentElement.classList.toggle('over', E.list.length>10);
+  if(state.tab==='style'){
+    box.innerHTML = S.tokens.length ? S.tokens.map((x,i)=>(i?`<span class="sep">${x.j!==undefined?x.j:', '}</span>`:'')+tokHTML(x)).join('') : '<span class="pempty">Выберите стиль — промт начнёт собираться.</span>';
+  } else if(state.tab==='lyrics'){
+    const html=[];
+    L.lines.forEach(l=>{
+      if(l.blank) html.push('');
+      else if(l.ph!==undefined){ if(state.showPh) html.push(`<span class="phl">&gt;&gt;&gt; ${esc(l.ph)} &lt;&lt;&lt;</span>`); }
+      else if(l.sec) html.push(tagHTML(l.sec));
+      else html.push(l.tokens.map(tokHTML).join(' '));
+    });
+    box.innerHTML = html.join('\n').replace(/\n{3,}/g,'\n\n').trim() || '<span class="pempty">Добавьте секции в шаге 2.</span>';
+  } else {
+    box.innerHTML = E.list.length ? E.list.map(x=>tokHTML(tk(x.t,2,x.auto?('Добавлено автоматически: '+x.why):'Категория в Exclude Styles — единственный рабочий путь для отрицаний.'))).join('<span class="sep">, </span>') : '<span class="pempty">Exclude пуст. Нежелательное добавляйте в шаге 4 — категориями, до 10 пунктов.</span>';
+  }
+  $('#copyLbl').textContent = 'Копировать '+({style:'Style',lyrics:'Lyrics',excl:'Exclude'})[state.tab];
+  $('#phWrap').style.display = state.tab==='lyrics' ? '' : 'none';
+  // reliability
+  const all = [...S.tokens];
+  L.lines.forEach(l=>{ if(l.sec){ all.push({lv:l.sec.nameLv}); l.sec.items.forEach(x=>all.push(x)); } else if(l.tokens) l.tokens.forEach(x=>all.push(x)); });
+  const cnt={1:0,2:0,3:0,4:0}; all.forEach(x=>cnt[x.lv]++); const tot=all.length||1;
+  const good = Math.round((cnt[1]+cnt[2])/tot*100);
+  $('#relPct').textContent = all.length? good+'%':'—';
+  $('#relCnt').textContent = all.length ? `уровни 1–2 · ${all.length} элементов` : '';
+  $('#relbar').innerHTML = [1,2,3,4].map(l=>cnt[l]?`<span class="sw l${l}" style="flex:${cnt[l]};border-radius:0;width:auto" title="${LVNAME[l]}: ${cnt[l]}"></span>`:'').join('');
+  $('#legend').innerHTML = [1,2,3,4].map(l=>`<div><span class="sw l${l}"></span>${l} · ${LVNAME[l]}<b>${cnt[l]}</b></div>`).join('');
+  // settings
+  const dur = state.sections.reduce((a,x)=>a+secDur(x),0);
+  const recModel = state.genres.some(g=>G[g].model==='v6-wild') ? 'v6-wild' : 'v6';
+  const model = state.model==='auto' ? recModel : state.model;
+  $('#mdlBadge').textContent = model;
+  const maxOn = dur>120;
+  $('#sets').innerHTML = `
+    <div class="set"><span>Модель</span><select class="sel" id="modelSel"><option value="auto" ${state.model==='auto'?'selected':''}>Авто: ${recModel}</option><option value="v6" ${state.model==='v6'?'selected':''}>v6 — точность</option><option value="v6-wild" ${state.model==='v6-wild'?'selected':''}>v6-wild — эксперимент</option><option value="v6-mini" ${state.model==='v6-mini'?'selected':''}>v6-mini — черновик</option></select><small>${model==='v6-mini'?'Бесплатно — для черновиков и проверки текста':model==='v6-wild'?'Когда v6 звучит плоско, и для экспериментов':'Когда промт конкретный'}</small></div>
+    <div class="set"><span>Variety</span><b>Off</b><small>Иначе Suno перепишет ваш Style до генерации</small></div>
+    <div class="set"><span>Style Influence</span><b>75–85%</b><small>По умолчанию 50% — половина промта отдаётся модели</small></div>
+    <div class="set"><span>Weirdness</span><b>50%</b><small>Нейтраль. 0 не выключает, а делает консервативнее</small></div>
+    <div class="set" style="grid-column:1/-1"><span>Max Mode</span><b>${!dur?'—':maxOn?'Включить на финальном дубле':'Не нужен'}</b><small>${!dur?'Соберите структуру в шаге 2 — тогда появится оценка длины.':`Оценочная длина ≈ ${fmtTime(dur)}. `+(maxOn?'Длиннее ~2 минут — Max Mode держит вокал и стиль, но стоит вдвое дороже (20 кредитов вместо 10).':'Короче ~2 минут — на черновиках Max Mode лишний расход.')}</small></div>`;
+  // checks
+  const C = buildChecks(S,L,E);
+  const ord={err:0,warn:1,tip:2,ok:3}; C.sort((a,b)=>ord[a.sev]-ord[b.sev]);
+  $('#chkCnt').textContent = `${C.filter(c=>c.sev==='err').length} ошибок · ${C.filter(c=>c.sev==='warn').length} предупреждений`;
+  $('#checks').innerHTML = C.map(c=>`<li class="${c.sev}">${IC[c.sev]}<div>${c.html}${c.fix?`<div class="fix"><button class="mini" data-fix="${c.fix.act}" data-id="${c.fix.id||''}">${IC.plus}${c.fix.ru}</button></div>`:''}</div></li>`).join('');
+}
+
+/* ================= RENDER ALL ================= */
+function renderAll(){ renderGenres(); renderTempo(); renderStructure(); renderVocal(); renderInst(); renderOutput(); save(); }
+function refreshLight(){ renderTimeline(); renderVocal(); renderInst(); renderOutput(); updateCardPreviews(); save(); }
+function updateCardPreviews(){
+  const labs=labels();
+  state.sections.forEach((s,i)=>{ const el=document.querySelector(`.scard[data-uid="${s.uid}"] [data-tagprev]`); if(el) el.innerHTML = tagHTML(sectionTag(s,labs[i])); });
+}
+
+/* ================= EVENTS ================= */
+document.addEventListener('click', e=>{
+  const t = e.target.closest('button, [data-genre]'); if(!t) return;
+  const ds = t.dataset;
+  if(ds.gtab){ state.gtab=ds.gtab; renderGenres(); save(); return; }
+  if(ds.genre){
+    const id=ds.genre; const i=state.genres.indexOf(id);
+    if(i>=0) state.genres.splice(i,1);
+    else if(state.genres.length<2) state.genres.push(id);
+    else { state.genres[1]=id; toast('Максимум 2 стиля — заменили примесь'); }
+    applyGenreDefaults(); renderAll(); return;
+  }
+  if(ds.act==='swapg'){ state.genres.reverse(); applyGenreDefaults(); renderAll(); return; }
+  if(ds.act==='clearg'){ state.genres=[]; applyGenreDefaults(); renderAll(); return; }
+  if(ds.mood){ const m=ds.mood; const a=state.moods; const i=a.indexOf(m); if(i>=0) a.splice(i,1); else { if(a.length>=2) a.shift(); a.push(m); } renderGenres(); renderOutput(); save(); return; }
+  if(ds.tpl){ loadTemplate(ds.tpl,true); renderAll(); toast('Шаблон «'+TEMPLATES[ds.tpl].ru+'» загружен'); return; }
+  if(ds.add){
+    const x=mkSec(ds.add); const endIdx = state.sections.findIndex(s=>s.type==='end');
+    const outIdx = state.sections.findIndex(s=>s.type==='outro');
+    let pos = state.sections.length;
+    if(ds.add!=='end' && ds.add!=='outro'){ if(outIdx>=0) pos=outIdx; else if(endIdx>=0) pos=endIdx; }
+    else if(ds.add==='outro' && endIdx>=0) pos=endIdx;
+    if(state.vocal.type==='duet') x.singer='both';
+    state.sections.splice(pos,0,x); state.structTouched=true; openSet.add(x.uid);
+    renderStructure(); refreshLight(); flash(x.uid); return;
+  }
+  if(ds.focus){ const uid=+ds.focus; openSet.add(uid); renderCards(); renderTimeline(); flash(uid, true); return; }
+  if(ds.fix){
+    if(ds.fix==='add-inst' && ds.id){ if(!state.inst.includes(ds.id)) state.inst.push(ds.id); state.instTouched=true; toast('Добавлено: '+INST[ds.id].ru); }
+    if(ds.fix==='add-outro'){ const endIdx=state.sections.findIndex(s=>s.type==='end'); const x=mkSec('outro'); if(endIdx>=0) state.sections.splice(endIdx,0,x); else state.sections.push(x, mkSec('end')); state.structTouched=true; }
+    renderAll(); return;
+  }
+  // card actions
+  const card = t.closest('.scard');
+  if(card){
+    const uid=+card.dataset.uid; const idx=state.sections.findIndex(s=>s.uid===uid); const s=state.sections[idx]; if(!s) return;
+    if(ds.act==='toggle'){ openSet.has(uid)?openSet.delete(uid):openSet.add(uid); card.classList.toggle('open'); t.setAttribute('aria-expanded', openSet.has(uid)); renderTimeline(); return; }
+    if(ds.act==='up' && idx>0){ [state.sections[idx-1],state.sections[idx]]=[state.sections[idx],state.sections[idx-1]]; state.structTouched=true; renderStructure(); refreshLight(); return; }
+    if(ds.act==='down' && idx<state.sections.length-1){ [state.sections[idx+1],state.sections[idx]]=[state.sections[idx],state.sections[idx+1]]; state.structTouched=true; renderStructure(); refreshLight(); return; }
+    if(ds.act==='dup'){ const c=Object.assign(JSON.parse(JSON.stringify(s)),{uid:uidC++}); state.sections.splice(idx+1,0,c); state.structTouched=true; renderStructure(); refreshLight(); flash(c.uid); toast('Секция скопирована'); return; }
+    if(ds.act==='del'){ state.sections.splice(idx,1); openSet.delete(uid); state.structTouched=true; renderStructure(); refreshLight(); return; }
+    if(ds.f==='solo'){ s.solo=ds.v; }
+    else if(ds.f==='ending'){ s.ending=ds.v; }
+    else if(ds.f==='energy'){ s.energy=+ds.v; }
+    else if(ds.f==='bars'){ s.bars=+ds.v; }
+    else if(ds.f==='barsm'){ s.bars=Math.max(2, (s.bars||2)-2); }
+    else if(ds.f==='barsp'){ s.bars=Math.min(MAX_BARS, (s.bars||0)+2); }
+    else if(ds.f==='arr'){ const a=s.arr; const i=a.indexOf(ds.v); if(i>=0) a.splice(i,1); else { if(a.length>=2) a.shift(); a.push(ds.v); } }
+    else return;
+    state.structTouched=true; renderCards(); refreshLight(); return;
+  }
+  // vocal
+  if(ds.vtype){ state.vocal.type = state.vocal.type===ds.vtype ? null : ds.vtype; state.vocTouched=true; if(ds.vtype==='duet') assignDuet(); renderStructure(); refreshLight(); return; }
+  if(ds.timbre){ const a=state.vocal.timbre; const i=a.indexOf(ds.timbre); if(i>=0) a.splice(i,1); else { if(a.length>=2) a.shift(); a.push(ds.timbre); } state.vocTouched=true; refreshLight(); return; }
+  if(ds.deliv){ state.vocal.delivery = state.vocal.delivery===ds.deliv ? '' : ds.deliv; state.vocTouched=true; refreshLight(); updateCardPreviews(); return; }
+  if(ds.psinger){ const row=t.closest('.prt'); const s=state.sections.find(x=>x.uid===+row.dataset.uid); if(s){ s.singer=ds.psinger; } renderCards(); refreshLight(); return; }
+  if(ds.verb){ const a=state.vocal.verbs; const i=a.indexOf(ds.verb); i>=0?a.splice(i,1):a.push(ds.verb); refreshLight(); return; }
+  if('harm' in ds){ state.vocal.harmonies=!state.vocal.harmonies; refreshLight(); return; }
+  if(ds.lang){ state.vocal.lang=ds.lang; refreshLight(); return; }
+  // inst
+  if(ds.inst){ const a=state.inst; const i=a.indexOf(ds.inst); i>=0?a.splice(i,1):a.push(ds.inst); state.instTouched=true; refreshLight(); return; }
+  if(ds.prod){ const a=state.prod; const i=a.indexOf(ds.prod); if(i>=0) a.splice(i,1); else { if(a.length>=3) a.shift(); a.push(ds.prod); } refreshLight(); return; }
+  if(ds.tex){ const a=state.tex; const i=a.indexOf(ds.tex); i>=0?a.splice(i,1):a.push(ds.tex); state.texTouched=true; refreshLight(); return; }
+  if(ds.sfx){ const k=ds.sfx; if(state.sfx[k]) delete state.sfx[k]; else state.sfx[k] = state.sections.some(s=>s.type==='intro')?'intro':'outro'; refreshLight(); return; }
+  if(ds.sfxpos){ state.sfx[ds.sfxpos]=ds.v; refreshLight(); return; }
+  if(ds.excl){ const a=state.exclude; const i=a.indexOf(ds.excl); i>=0?a.splice(i,1):a.push(ds.excl); state.exTouched=true; refreshLight(); return; }
+  // output
+  if(ds.tab){ state.tab=ds.tab; renderOutput(); save(); return; }
+  if(ds.mcopy){ copyText(fieldText(ds.mcopy), ({style:'Style',lyrics:'Lyrics',excl:'Exclude'})[ds.mcopy]); return; }
+});
+
+document.addEventListener('change', e=>{
+  const t=e.target; const ds=t.dataset;
+  if(t.id==='useBpm'){ state.useBpm=t.checked; renderTempo(); renderOutput(); save(); return; }
+  if(t.id==='key'){ state.key=t.value; renderOutput(); save(); return; }
+  if(t.id==='showLv'){ state.showLv=t.checked; renderOutput(); save(); return; }
+  if(t.id==='showPh'){ state.showPh=t.checked; renderOutput(); save(); return; }
+  if(t.id==='modelSel'){ state.model=t.value; renderOutput(); save(); return; }
+  if(ds.guard){ state.guards[ds.guard]=t.checked; refreshLight(); return; }
+  if('pdeliv' in ds){ const row=t.closest('.prt'); const s=state.sections.find(x=>x.uid===+row.dataset.uid); if(s) s.delivery=t.value; state.structTouched=true; updateCardPreviews(); renderOutput(); renderTimeline(); save(); return; }
+  const card=t.closest('.scard');
+  if(card && ds.f){
+    const s=state.sections.find(x=>x.uid===+card.dataset.uid); if(!s) return;
+    if(ds.f==='desc') s.desc=t.checked;
+    if(ds.f==='vox') s.vox=t.checked;
+    state.structTouched=true; renderCards(); refreshLight();
+  }
+});
+document.addEventListener('input', e=>{
+  const t=e.target;
+  if(t.id==='bpm'){ state.bpm=+t.value; state.bpmTouched=true; $('#bpmVal').textContent=state.bpm; renderTimeline(); renderOutput(); save(); return; }
+  const card=t.closest('.scard');
+  if(card && t.dataset.f==='custom'){ const s=state.sections.find(x=>x.uid===+card.dataset.uid); if(!s) return; s.custom=t.value; state.structTouched=true; updateCardPreviews(); renderOutput(); save(); }
+});
+
+/* ================= DRAG: лента и карточки ================= */
+let DRAG = null;
+function sectionsFromDOM(sel){
+  const order = [...document.querySelectorAll(sel)].map(el=>+el.dataset.uid);
+  const map = new Map(state.sections.map(s=>[s.uid,s]));
+  const next = order.map(u=>map.get(u)).filter(Boolean);
+  if(next.length===state.sections.length) state.sections = next;
+}
+function moveSection(uid, dir){
+  const i = state.sections.findIndex(s=>s.uid===uid); const j = i+dir; const s = state.sections[i];
+  if(i<0 || j<0 || j>=state.sections.length || s.type==='end' || state.sections[j].type==='end') return false;
+  [state.sections[i], state.sections[j]] = [state.sections[j], state.sections[i]];
+  state.structTouched = true; return true;
+}
+function startDrag(e, el, kind){
+  const r = el.getBoundingClientRect();
+  DRAG = {kind, el, uid:+el.dataset.uid, x0:e.clientX, y0:e.clientY, x:e.clientX, y:e.clientY, offX:e.clientX-r.left, offY:e.clientY-r.top, rect:r, started:false, ghost:null, raf:0};
+  window.addEventListener('pointermove', onDragMove);
+  window.addEventListener('pointerup', onDragEnd, {once:true});
+  window.addEventListener('pointercancel', onDragEnd, {once:true});
+}
+function beginDrag(){
+  const D = DRAG; D.started = true;
+  const g = D.el.cloneNode(true); g.classList.add('ghost'); g.classList.remove('open','focus');
+  g.style.width = D.rect.width+'px'; g.style.height = (D.kind==='tl' ? D.rect.height : Math.min(D.rect.height, 64))+'px';
+  g.style.left = D.rect.left+'px'; g.style.top = D.rect.top+'px'; g.style.overflow='hidden';
+  document.body.appendChild(g); D.ghost = g;
+  D.el.classList.add(D.kind==='tl' ? 'dragging' : 'drag');
+  document.body.classList.add('dnd');
+  const loop = ()=>{ if(!DRAG || !DRAG.started) return; autoScroll(); placeDragged(); DRAG.raf = requestAnimationFrame(loop); };
+  D.raf = requestAnimationFrame(loop);
+}
+function onDragMove(ev){
+  const D = DRAG; if(!D || D.fixed) return;
+  D.x = ev.clientX; D.y = ev.clientY;
+  if(!D.started){
+    const dist = D.kind==='tl' ? Math.abs(D.x-D.x0) : Math.abs(D.y-D.y0);
+    if(dist < 5) return;
+    beginDrag();
+  }
+  if(D.kind==='tl'){ D.ghost.style.left = (D.x - D.offX)+'px'; D.ghost.style.top = (D.rect.top - 6)+'px'; }
+  else { D.ghost.style.top = (D.y - D.offY)+'px'; }
+}
+function placeDragged(){
+  const D = DRAG; const box = D.kind==='tl' ? $('#timeline') : $('#cards');
+  const items = [...box.children].filter(c=>c!==D.el && c.dataset.uid);
+  const fixedEnd = items.find(c=>c.dataset.fixed || (D.kind==='card' && state.sections.find(s=>s.uid===+c.dataset.uid)?.type==='end'));
+  let target = null;
+  for(const c of items){
+    if(c===fixedEnd) break;
+    const r = c.getBoundingClientRect();
+    const before = D.kind==='tl' ? D.x < r.left + r.width/2 : D.y < r.top + r.height/2;
+    if(before){ target = c; break; }
+  }
+  if(!target) target = fixedEnd || null;
+  if(target){ if(D.el.nextElementSibling !== target) box.insertBefore(D.el, target); }
+  else if(box.lastElementChild !== D.el) box.appendChild(D.el);
+}
+function autoScroll(){
+  const D = DRAG;
+  if(D.kind==='tl'){
+    const sc = $('#arrScroll'); const r = sc.getBoundingClientRect();
+    if(D.x < r.left + 30) sc.scrollLeft -= 10; else if(D.x > r.right - 30) sc.scrollLeft += 10;
+  } else {
+    if(D.y < 70) window.scrollBy(0,-14); else if(D.y > window.innerHeight - 90) window.scrollBy(0,14);
+  }
+}
+function onDragEnd(){
+  const D = DRAG; window.removeEventListener('pointermove', onDragMove); DRAG = null;
+  if(!D) return;
+  cancelAnimationFrame(D.raf);
+  if(!D.started){
+    // это был клик
+    if(D.kind==='tl'){ openSet.add(D.uid); renderCards(); renderTimeline(true); flash(D.uid, true); }
+    else { openSet.has(D.uid)?openSet.delete(D.uid):openSet.add(D.uid); renderCards(); renderTimeline(true); }
+    return;
+  }
+  D.ghost.remove(); document.body.classList.remove('dnd');
+  D.el.classList.remove('dragging','drag');
+  const before = state.sections.map(s=>s.uid).join();
+  sectionsFromDOM(D.kind==='tl' ? '#timeline .tl' : '#cards .scard');
+  if(state.sections.map(s=>s.uid).join() !== before){ state.structTouched = true; toast('Порядок секций изменён'); }
+  renderCards(); renderTimeline(true); renderVocal(); renderOutput(); updateCardPreviews(); save();
+}
+function startResize(e, tl){
+  const uid=+tl.dataset.uid; const s=state.sections.find(x=>x.uid===uid); if(!s) return;
+  const b0 = s.bars, x0 = e.clientX;
+  tl.classList.add('resizing'); document.body.classList.add('rzing');
+  const tip = document.createElement('div'); tip.className='rz-tip'; tl.appendChild(tip);
+  const card = document.querySelector(`.scard[data-uid="${uid}"]`);
+  const upd = ()=>{
+    const t = fmtTime(secDur(s));
+    tip.textContent = `${s.bars} тактов · ≈${t}`;
+    tl.style.width = blockW(s)+'px';
+    const sm = tl.querySelector('small'); if(sm) sm.textContent = `${s.bars} т · ${t}`;
+    if(card){ const m=card.querySelector('[data-meta]'); if(m) m.textContent = `${s.bars} тактов · ≈${t}${effVox(s)?' · вокал':''}`;
+      const lb=card.querySelector('[data-lenlbl]'); if(lb) lb.textContent=`${s.bars} тактов`; const lt=card.querySelector('[data-lentime]'); if(lt) lt.textContent='≈'+t; }
+    renderRuler(); updateTlMeta();
+  };
+  upd();
+  const mv = ev=>{
+    const step = ev.shiftKey ? 1 : 2;
+    let b = Math.round((b0 + (ev.clientX - x0)/PPB)/step)*step;
+    b = Math.max(step===1?1:2, Math.min(MAX_BARS, b));
+    if(b!==s.bars){ s.bars=b; upd(); }
+    const sc=$('#arrScroll'), r=sc.getBoundingClientRect(); if(ev.clientX > r.right-24) sc.scrollLeft += 8;
+  };
+  const up = ()=>{
+    window.removeEventListener('pointermove', mv);
+    tl.classList.remove('resizing'); document.body.classList.remove('rzing'); tip.remove();
+    if(s.bars!==b0) state.structTouched = true;
+    const over = $('#arrInner').scrollWidth > $('#arrScroll').clientWidth + 2;
+    renderTimeline(!over); renderCards(); renderOutput(); save();
+  };
+  window.addEventListener('pointermove', mv);
+  window.addEventListener('pointerup', up, {once:true});
+  window.addEventListener('pointercancel', up, {once:true});
+}
+$('#timeline').addEventListener('pointerdown', e=>{
+  if(e.button!==0) return;
+  const tl = e.target.closest('.tl'); if(!tl) return;
+  e.preventDefault();
+  if(e.target.closest('[data-rz]')){ startResize(e, tl); return; }
+  startDrag(e, tl, 'tl');
+  if(tl.dataset.fixed) DRAG.fixed = true;
+});
+$('#timeline').addEventListener('keydown', e=>{
+  const tl = e.target.closest('.tl'); if(!tl) return;
+  const uid=+tl.dataset.uid; const s=state.sections.find(x=>x.uid===uid); if(!s) return;
+  let changed=false;
+  if(e.key==='ArrowLeft') changed = moveSection(uid,-1);
+  else if(e.key==='ArrowRight') changed = moveSection(uid,1);
+  else if(e.key==='ArrowUp' && s.type!=='end'){ s.bars=Math.min(MAX_BARS,s.bars+2); changed=true; }
+  else if(e.key==='ArrowDown' && s.type!=='end'){ s.bars=Math.max(2,s.bars-2); changed=true; }
+  else if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openSet.add(uid); renderCards(); renderTimeline(true); flash(uid,true); return; }
+  else return;
+  e.preventDefault();
+  if(changed){ state.structTouched=true; renderTimeline(true); renderCards(); renderVocal(); renderOutput(); updateCardPreviews(); save(); }
+  const again = document.querySelector(`#timeline .tl[data-uid="${uid}"]`); if(again) again.focus();
+});
+$('#cards').addEventListener('pointerdown', e=>{
+  if(e.button!==0) return;
+  const head = e.target.closest('.sc-h'); if(!head) return;
+  if(e.target.closest('.sc-act')) return;
+  const grip = e.target.closest('[data-grip]');
+  if(e.pointerType!=='mouse' && !grip) return; // на тач-экране тащим только за ручку
+  const card = head.closest('.scard');
+  if(state.sections.find(s=>s.uid===+card.dataset.uid)?.type==='end') return;
+  e.preventDefault();
+  startDrag(e, card, 'card');
+});
+$('#cards').addEventListener('keydown', e=>{
+  const g = e.target.closest('[data-grip]'); if(!g) return;
+  const uid=+g.closest('.scard').dataset.uid;
+  const dir = e.key==='ArrowUp' ? -1 : e.key==='ArrowDown' ? 1 : 0; if(!dir) return;
+  e.preventDefault();
+  if(moveSection(uid,dir)){ renderCards(); renderTimeline(true); renderVocal(); renderOutput(); save(); }
+  const again=document.querySelector(`.scard[data-uid="${uid}"] [data-grip]`); if(again) again.focus();
+});
+let rzT=0; window.addEventListener('resize', ()=>{ clearTimeout(rzT); rzT=setTimeout(()=>renderTimeline(false),150); });
+
+function flash(uid, scroll){
+  const el=document.querySelector(`.scard[data-uid="${uid}"]`); if(!el) return;
+  if(scroll) el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.animate([{boxShadow:'0 0 0 3px var(--accent)'},{boxShadow:'0 0 0 0 transparent'}],{duration:900});
+}
+
+/* copy / download */
+function fieldText(f){ return f==='style'?LAST.S.text : f==='lyrics'?LAST.L.text : LAST.E.text; }
+async function copyText(txt,label){
+  try{ await navigator.clipboard.writeText(txt); toast(label+' скопирован'); }
+  catch(e){
+    const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast(label+' скопирован'); }catch(_){ toast('Не удалось скопировать — выделите текст вручную'); }
+    ta.remove();
+  }
+}
+function allText(){
+  const dur = state.sections.reduce((a,x)=>a+secDur(x),0);
+  const recModel = state.genres.some(g=>G[g].model==='v6-wild')?'v6-wild':'v6'; const model = state.model==='auto'?recModel:state.model;
+  return `SUNO v6 — промт из конструктора\nМодель: ${model} · Variety: Off · Style Influence: 75–85% · Weirdness: 50% · Max Mode: ${dur>120?'вкл. на финальном дубле':'не нужен'}\n\n=== STYLE ===\n${LAST.S.text}\n\n=== EXCLUDE STYLES ===\n${LAST.E.text}\n\n=== LYRICS ===\n${LAST.L.text}\n`;
+}
+$('#copyBtn').addEventListener('click', ()=>copyText(fieldText(state.tab), ({style:'Style',lyrics:'Lyrics',excl:'Exclude'})[state.tab]));
+$('#copyAll').addEventListener('click', ()=>copyText(allText(),'Промт целиком'));
+$('#dlBtn').addEventListener('click', ()=>{
+  const blob=new Blob([allText()],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a');
+  const p=primary(); a.download=`suno-v6-${p?state.genres.join('-'):'prompt'}.txt`; a.href=URL.createObjectURL(blob); document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500);
+});
+$('#resetBtn').addEventListener('click', ()=>{ if(!confirm('Сбросить конструктор и начать заново?')) return; const th=document.documentElement.dataset.theme; state=defaultState(); openSet.clear(); renderAll(); if(th) document.documentElement.dataset.theme=th; toast('Конструктор сброшен'); });
+$('#toOut').addEventListener('click', ()=>$('#out').scrollIntoView({behavior:'smooth'}));
+$('#themeBtn').addEventListener('click', ()=>{
+  const root=document.documentElement; const cur = root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  root.dataset.theme = cur==='dark'?'light':'dark'; try{ localStorage.setItem(LS_KEY+'-theme', root.dataset.theme); }catch(e){}
+});
+
+/* ================= INIT ================= */
+try{ const th=localStorage.getItem(LS_KEY+'-theme'); if(th) document.documentElement.dataset.theme=th; }catch(e){}
+load();
+renderAll();
+</script>
+</body>
+</html>
