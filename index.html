@@ -102,6 +102,19 @@ input.inp::placeholder{color:var(--ink-3)}
 .gtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .gtabs button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--ink-2)}
 .gtabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.genre-search{width:100%;margin:2px 0 12px}
+.preset-shelf{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;margin-bottom:16px}
+.preset-card{border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:10px 12px;text-align:left;color:var(--ink)}
+.preset-card:hover{border-color:var(--accent);background:var(--accent-soft)}
+.preset-card b{display:block;font-size:12.5px}
+.preset-card small{display:block;color:var(--ink-3);font-size:11px;margin-top:3px}
+.genre-guide{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:11px 13px}
+.genre-guide summary{cursor:pointer;font-size:13px;font-weight:600}
+.genre-guide>p{font-size:12px;color:var(--ink-3);margin:7px 0 10px}
+.genre-guide-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:7px}
+.genre-help{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:9px 10px}
+.genre-help b{font-size:12px}
+.genre-help small{display:block;color:var(--ink-3);margin-top:2px}
 .ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:9px}
 .gcard{position:relative;text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:14px;padding:12px 12px 11px;transition:transform .12s,border-color .15s,background .15s}
 .gcard:hover{border-color:var(--line-2);transform:translateY(-1px)}
@@ -347,8 +360,13 @@ footer.ft{margin-top:10px;font-size:12px;color:var(--ink-3);line-height:1.5}
       <!-- STEP 1 -->
       <section class="panel" id="s-style">
         <div class="ph"><div class="num">1</div><div><h2>Стиль</h2><p>Выберите один ведущий стиль и, если нужно, второй — как примесь. Один ведущий жанр плюс один партнёр — максимум, при котором v6 держит жанр надёжно.</p></div></div>
+        <div class="sub-h" style="margin-top:0"><h3>Быстрый старт</h3><span class="cnt">Пресет загрузит жанр и подходящий шаблон</span></div>
+        <div class="preset-shelf" id="presetShelf"></div>
+        <div class="sub-h"><h3>Жанр</h3></div>
         <div class="gtabs" id="gtabs"></div>
+        <input class="inp genre-search" id="genreSearch" type="search" placeholder="Найти жанр…" aria-label="Найти жанр">
         <div class="ggrid" id="ggrid"></div>
+        <details class="genre-guide"><summary>Справочник жанров</summary><p>Краткое описание и примерный темп для жанров из каталога. BPM здесь — ориентир, а не правило.</p><div class="genre-guide-list" id="genreGuideList"></div></details>
         <div class="selbar" id="selbar"></div>
         <div class="sub-h"><h3>Настроение</h3><span class="cnt" id="moodCnt"></span></div>
         <div class="chips" id="moods"></div>
@@ -567,6 +585,22 @@ const G = {
   jazz:{ru:'Джаз / лаунж',g:'mood',en:'smooth jazz lounge',energy:2,bpm:[80,120,96],inst:{brushes:'soft brushed drums',upright:'walking upright bass',piano:'jazz piano',sax:'smooth saxophone'},arr:'relaxed swing with a solo section',prod:'warm intimate club sound',end:'ends on a soft jazz chord',fusion:'jazz harmony and swing',tmpl:'ballad',ex:['autotune'],voc:{type:'female',delivery:'crooning',timbre:['smoky']}}
 };
 const G_ORDER = ['pop','dancepop','rupop','rnb','indiepop','house','slaphouse','techno','dnb','synthwave','phonk','hiphop','trap','melrap','altrock','poppunk','metal','folk','ambient','lofi','cinematic','ballad','jazz'];
+const PRESETS = [
+  {id:'radio-pop',name:'Поп с большим припевом',genre:'pop',moods:['uplifting'],note:'Мелодичный поп, широкий припев'},
+  {id:'night-synth',name:'Ночной синтвейв',genre:'synthwave',moods:['nostalgic','dark'],note:'Ретро-синтезаторы и ночное настроение'},
+  {id:'deep-house',name:'Мягкий хаус',genre:'house',moods:['hypnotic'],note:'Ровный клубный грув'},
+  {id:'cinematic',name:'Киноэпик',genre:'cinematic',moods:['epic'],note:'Оркестр, нарастание, кульминация'},
+  {id:'piano-ballad',name:'Фортепианная баллада',genre:'ballad',moods:['melancholic'],note:'Камерные куплеты и эмоциональный припев'},
+  {id:'boom-bap',name:'Бумбэп',genre:'hiphop',moods:['nostalgic'],note:'Плотный бит и рэп-структура'},
+  {id:'pop-punk',name:'Поп-панк',genre:'poppunk',moods:['aggressive'],note:'Быстрые гитары и припев-хук'},
+  {id:'ambient',name:'Спокойный эмбиент',genre:'ambient',moods:['dreamy'],note:'Медленный инструментальный саундскейп'}
+];
+const G_HELP = {
+  pop:'Широкая песенная форма, ясный хук и современная поп-аранжировка.',dancepop:'Поп-структура с танцевальной бочкой, синт-басом и энергичным припевом.',rupop:'Мелодичная поп-песня с русскоязычной подачей и мягкой эстрадной аранжировкой.',rnb:'Расслабленный грув, выразительный вокал, Rhodes и басовая опора.',indiepop:'Лёгкая гитарная или синтезаторная фактура с менее глянцевым звучанием.',
+  house:'Ровная бочка 4/4, повторяющийся басовый грув и постепенное развитие.',slaphouse:'Танцевальный хаус с упругим басом и ярким дропом.',techno:'Механичный пульс 4/4, повторение и медленное наращивание слоёв.',dnb:'Быстрые брейкбиты, глубокий бас и воздушные синтезаторные слои.',synthwave:'Ретро-синтезаторы, драм-машина и кинематографическое настроение 1980-х.',phonk:'Жёсткий низ, характерный колокольный рисунок и короткий повторяющийся грув.',
+  hiphop:'Бумбэп-бит, семпловая фактура и рэп-куплеты с хуком.',trap:'Тяжёлый 808-бас, быстрые хэты и просторная ритмическая сетка.',melrap:'Рэп-куплеты сочетаются с мелодичным, часто пропетым хуком.',altrock:'Живые барабаны и перегруженные гитары; динамика от сдержанного куплета к мощному припеву.',poppunk:'Быстрые панк-гитары, прямой ритм и цепкий припев.',metal:'Тяжёлые гитары и ударные; может включать плотные риффы и резкие динамические контрасты.',folk:'Акустические инструменты, более естественная подача и песенная форма.',
+  ambient:'Неторопливые звуковые слои и просторная фактура; обычно без выраженного бита.',lofi:'Мягкий повторяющийся грув с приглушённой, слегка шероховатой фактурой.',cinematic:'Оркестровый размах, постепенное нарастание и кульминация.',ballad:'Медленная песня с акцентом на мелодию, вокал и эмоциональный подъём.',jazz:'Свинг или мягкий джазовый грув с джазовой гармонией и возможным соло.'
+};
 
 const MOODS = {dark:['мрачное','dark'],melancholic:['меланхоличное','melancholic'],uplifting:['светлое','uplifting'],euphoric:['эйфоричное','euphoric'],dreamy:['мечтательное','dreamy'],aggressive:['агрессивное','aggressive'],romantic:['романтичное','romantic'],nostalgic:['ностальгичное','nostalgic'],intimate:['камерное','intimate'],epic:['эпичное','epic'],playful:['игривое','playful'],hypnotic:['гипнотичное','hypnotic'],tense:['напряжённое','tense']};
 const MOOD_CONFLICT = [['dark','playful'],['aggressive','dreamy'],['melancholic','euphoric'],['aggressive','romantic'],['tense','dreamy']];
@@ -1023,8 +1057,11 @@ function buildChecks(S,L,E){
 
 /* ================= RENDER: STEP 1 ================= */
 function renderGenres(){
+  $('#presetShelf').innerHTML = PRESETS.map(p=>`<button class="preset-card" data-preset="${p.id}"><b>${p.name}</b><small>${p.note}</small></button>`).join('');
   $('#gtabs').innerHTML = GROUPS.map(([k,r])=>`<button data-gtab="${k}" class="${state.gtab===k?'on':''}">${r}</button>`).join('');
-  const list = G_ORDER.filter(id=>state.gtab==='all'||G[id].g===state.gtab);
+  const q=($('#genreSearch').value||'').trim().toLowerCase();
+  const matches=id=>!q||`${G[id].ru} ${G[id].en} ${G_HELP[id]||''}`.toLowerCase().includes(q);
+  const list = G_ORDER.filter(id=>(state.gtab==='all'||G[id].g===state.gtab)&&matches(id));
   $('#ggrid').innerHTML = list.map(id=>{
     const g=G[id]; const i=state.genres.indexOf(id);
     const bars=[1,2,3,4,5].map(n=>`<span class="${n<=g.energy?'on':''}" style="height:${4+n*2}px"></span>`).join('');
@@ -1034,6 +1071,8 @@ function renderGenres(){
       <div class="gm"><span>${g.bpm[0]}–${g.bpm[1]} BPM</span>${g.model==='v6-wild'?'<span class="wild">v6-wild</span>':`<span class="ebar" title="Энергия">${bars}</span>`}</div>
     </button>`;
   }).join('');
+  if(!list.length) $('#ggrid').innerHTML='<div class="empty">Жанры не найдены. Попробуйте другой запрос.</div>';
+  $('#genreGuideList').innerHTML = G_ORDER.filter(matches).map(id=>`<article class="genre-help"><b>${G[id].ru}</b><small>${G_HELP[id]} Примерный темп в каталоге: ${G[id].bpm[0]}–${G[id].bpm[1]} BPM.</small></article>`).join('') || '<div class="empty">По запросу ничего не найдено.</div>';
   const p=primary(), s=secondary();
   $('#selbar').innerHTML = p ? `<span class="pill p1">1 · ведущий</span><b>${p.ru}</b>${s?`<span class="pill p2">2 · примесь</span><b>${s.ru}</b>`:'<span>Можно добавить второй стиль как примесь</span>'}
      <span class="sp"></span>${s?`<button class="mini" data-act="swapg">${IC.swap}Поменять</button>`:''}<button class="mini" data-act="clearg">${IC.x}Сбросить</button>`
@@ -1252,6 +1291,11 @@ function updateCardPreviews(){
 document.addEventListener('click', e=>{
   const t = e.target.closest('button, [data-genre]'); if(!t) return;
   const ds = t.dataset;
+  if(ds.preset){
+    const preset=PRESETS.find(x=>x.id===ds.preset); if(!preset) return;
+    if((state.genres.length||state.sections.length||state.instTouched||state.vocTouched) && !confirm('Загрузить пресет? Текущая настройка промпта будет заменена.')) return;
+    state=defaultState(); state.genres=[preset.genre]; state.moods=[...preset.moods]; applyGenreDefaults(); renderAll(); toast('Пресет «'+preset.name+'» загружен'); return;
+  }
   if(ds.gtab){ state.gtab=ds.gtab; renderGenres(); save(); return; }
   if(ds.genre){
     const id=ds.genre; const i=state.genres.indexOf(id);
@@ -1338,6 +1382,7 @@ document.addEventListener('change', e=>{
 });
 document.addEventListener('input', e=>{
   const t=e.target;
+  if(t.id==='genreSearch'){ renderGenres(); return; }
   if(t.id==='bpm'){ state.bpm=+t.value; state.bpmTouched=true; $('#bpmVal').textContent=state.bpm; renderTimeline(); renderOutput(); save(); return; }
   const card=t.closest('.scard');
   if(card && t.dataset.f==='custom'){ const s=state.sections.find(x=>x.uid===+card.dataset.uid); if(!s) return; s.custom=t.value; state.structTouched=true; updateCardPreviews(); renderOutput(); save(); }
