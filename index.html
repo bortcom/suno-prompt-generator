@@ -53,6 +53,7 @@ button{cursor:pointer}
 .brand h1{font-family:var(--f-disp);font-weight:600;font-size:22px;letter-spacing:-.01em;margin:0;line-height:1.15}
 .brand .sub{font-size:12.5px;color:var(--ink-3);margin-top:3px}
 .top-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.state-actions{display:flex;gap:6px;flex-wrap:wrap}
 .stepper{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px}
 .stepper a{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500}
 .stepper a:hover{background:var(--surface-2);color:var(--ink)}
@@ -312,6 +313,10 @@ footer.ft{margin-top:10px;font-size:12px;color:var(--ink-3);line-height:1.5}
   .tempo{grid-template-columns:1fr}
   .legend{grid-template-columns:1fr}
   .brand h1{font-size:18px}
+  .top{align-items:flex-start}
+  .top-r{width:100%;justify-content:flex-start}
+  .state-actions{order:3;width:100%}
+  .state-actions .icon-btn{flex:1;justify-content:center;padding:0 8px;font-size:12px}
   .timeline{height:54px}
   .tlb{padding:6px 10px 5px 6px}
   .tlb small{display:none}
@@ -333,6 +338,7 @@ footer.ft{margin-top:10px;font-size:12px;color:var(--ink-3);line-height:1.5}
       </nav>
       <button class="icon-btn" id="themeBtn" title="Сменить тему" aria-label="Сменить тему"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
       <button class="icon-btn" id="resetBtn" title="Начать заново"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Сброс</button>
+      <div class="state-actions"><button class="icon-btn" id="exportStateBtn" title="Скачать файл с настройками">Экспорт настроек</button><button class="icon-btn" id="importStateBtn" title="Загрузить настройки из файла">Импорт настроек</button><input id="importStateFile" type="file" accept="application/json,.json" hidden></div>
     </div>
   </header>
 
@@ -434,7 +440,7 @@ footer.ft{margin-top:10px;font-size:12px;color:var(--ink-3);line-height:1.5}
       </div>
 
       <div class="panel">
-        <div class="score"><div><span>Надёжность промта</span><div class="big" id="relPct">—</div></div><span id="relCnt"></span></div>
+        <div class="score"><div><span>Доля тегов уровней 1–2</span><div class="big" id="relPct">—</div><small class="note">Эвристическая оценка тегов, не вероятность удачной генерации</small></div><span id="relCnt"></span></div>
         <div class="relbar" id="relbar"></div>
         <div class="legend" id="legend"></div>
       </div>
@@ -1526,6 +1532,23 @@ $('#dlBtn').addEventListener('click', ()=>{
   const p=primary(); a.download=`suno-v6-${p?state.genres.join('-'):'prompt'}.txt`; a.href=URL.createObjectURL(blob); document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500);
 });
 $('#resetBtn').addEventListener('click', ()=>{ if(!confirm('Сбросить конструктор и начать заново?')) return; const th=document.documentElement.dataset.theme; state=defaultState(); openSet.clear(); renderAll(); if(th) document.documentElement.dataset.theme=th; toast('Конструктор сброшен'); });
+$('#exportStateBtn').addEventListener('click', ()=>{
+  const payload={app:'suno-prompt-builder',version:1,exportedAt:new Date().toISOString(),state};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'}); const a=document.createElement('a');
+  a.download='suno-prompt-settings.json'; a.href=URL.createObjectURL(blob); document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  toast('Файл настроек сохранён');
+});
+$('#importStateBtn').addEventListener('click', ()=>$('#importStateFile').click());
+$('#importStateFile').addEventListener('change', async e=>{
+  const file=e.target.files?.[0]; if(!file) return;
+  try{
+    const data=JSON.parse(await file.text());
+    if(data.app!=='suno-prompt-builder' || !data.state || !Array.isArray(data.state.genres) || !Array.isArray(data.state.sections)) throw new Error('bad file');
+    if(!confirm('Заменить текущие настройки данными из файла?')){e.target.value='';return;}
+    localStorage.setItem(LS_KEY,JSON.stringify(data.state)); location.reload();
+  }catch(err){ toast('Не удалось прочитать файл настроек'); }
+  e.target.value='';
+});
 $('#toOut').addEventListener('click', ()=>$('#out').scrollIntoView({behavior:'smooth'}));
 $('#themeBtn').addEventListener('click', ()=>{
   const root=document.documentElement; const cur = root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
