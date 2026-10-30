@@ -586,14 +586,14 @@ const G = {
 };
 const G_ORDER = ['pop','dancepop','rupop','rnb','indiepop','house','slaphouse','techno','dnb','synthwave','phonk','hiphop','trap','melrap','altrock','poppunk','metal','folk','ambient','lofi','cinematic','ballad','jazz'];
 const PRESETS = [
-  {id:'radio-pop',name:'Поп с большим припевом',genre:'pop',moods:['uplifting'],note:'Мелодичный поп, широкий припев'},
-  {id:'night-synth',name:'Ночной синтвейв',genre:'synthwave',moods:['nostalgic','dark'],note:'Ретро-синтезаторы и ночное настроение'},
-  {id:'deep-house',name:'Мягкий хаус',genre:'house',moods:['hypnotic'],note:'Ровный клубный грув'},
-  {id:'cinematic',name:'Киноэпик',genre:'cinematic',moods:['epic'],note:'Оркестр, нарастание, кульминация'},
-  {id:'piano-ballad',name:'Фортепианная баллада',genre:'ballad',moods:['melancholic'],note:'Камерные куплеты и эмоциональный припев'},
-  {id:'boom-bap',name:'Бумбэп',genre:'hiphop',moods:['nostalgic'],note:'Плотный бит и рэп-структура'},
-  {id:'pop-punk',name:'Поп-панк',genre:'poppunk',moods:['aggressive'],note:'Быстрые гитары и припев-хук'},
-  {id:'ambient',name:'Спокойный эмбиент',genre:'ambient',moods:['dreamy'],note:'Медленный инструментальный саундскейп'}
+  {id:'neon-drive',name:'Неоновая ночная поездка',genre:'synthwave',secondary:'dancepop',moods:['nostalgic','dark'],bpm:112,template:'pop',prod:['era80','wide'],note:'Синтвейв + дэнс-поп · 112 BPM · ретро-продакшн'},
+  {id:'cinematic-rock',name:'Киношный альтернативный рок',genre:'altrock',secondary:'cinematic',moods:['epic'],bpm:120,template:'rock',prod:['room','wide'],note:'Альт-рок + киноэпик · группа нарастает к финалу'},
+  {id:'vocal-house',name:'Вокальный клубный гимн',genre:'house',secondary:'dancepop',moods:['euphoric'],bpm:124,template:'dance',prod:['punchy','wide'],note:'Хаус + дэнс-поп · вокальный хук и дроп'},
+  {id:'dramatic-piano',name:'Драматичная фортепианная баллада',genre:'ballad',secondary:'cinematic',moods:['melancholic','intimate'],bpm:72,template:'ballad',prod:['vox_front','space'],note:'Баллада + киноэпик · близкий вокал и струнные'},
+  {id:'dusty-rap',name:'Пыльный меланхоличный рэп',genre:'hiphop',secondary:'lofi',moods:['nostalgic','melancholic'],bpm:90,template:'rap',prod:['lofi_tex','raw'],note:'Бумбэп + lo-fi · сдержанный бит и рэп-куплеты'},
+  {id:'punk-anthem',name:'Панк-гимн для сцены',genre:'poppunk',secondary:'pop',moods:['uplifting'],bpm:174,template:'rock',prod:['room','punchy'],note:'Поп-панк + поп · быстрые куплеты и большой припев'},
+  {id:'ambient-score',name:'Тихий кинематографический эмбиент',genre:'ambient',secondary:'cinematic',moods:['dreamy','tense'],bpm:70,template:'inst',prod:['space','analog'],note:'Эмбиент + киноэпик · без вокала, медленное развитие'},
+  {id:'retro-russian-pop',name:'Русский ретро-синти-поп',genre:'rupop',secondary:'synthwave',moods:['nostalgic','uplifting'],bpm:108,template:'pop',prod:['era80','vox_front'],note:'Русский поп + синтвейв · мелодичный ретро-припев'}
 ];
 const G_HELP = {
   pop:'Широкая песенная форма, ясный хук и современная поп-аранжировка.',dancepop:'Поп-структура с танцевальной бочкой, синт-басом и энергичным припевом.',rupop:'Мелодичная поп-песня с русскоязычной подачей и мягкой эстрадной аранжировкой.',rnb:'Расслабленный грув, выразительный вокал, Rhodes и басовая опора.',indiepop:'Лёгкая гитарная или синтезаторная фактура с менее глянцевым звучанием.',
@@ -1294,7 +1294,10 @@ document.addEventListener('click', e=>{
   if(ds.preset){
     const preset=PRESETS.find(x=>x.id===ds.preset); if(!preset) return;
     if((state.genres.length||state.sections.length||state.instTouched||state.vocTouched) && !confirm('Загрузить пресет? Текущая настройка промпта будет заменена.')) return;
-    state=defaultState(); state.genres=[preset.genre]; state.moods=[...preset.moods]; applyGenreDefaults(); renderAll(); toast('Пресет «'+preset.name+'» загружен'); return;
+    state=defaultState(); state.genres=[preset.genre,preset.secondary]; state.moods=[...preset.moods]; applyGenreDefaults();
+    state.bpm=preset.bpm; state.bpmTouched=true; state.prod=[...preset.prod];
+    if(preset.template!==G[preset.genre].tmpl) loadTemplate(preset.template,true);
+    renderAll(); toast('Пресет «'+preset.name+'» загружен'); return;
   }
   if(ds.gtab){ state.gtab=ds.gtab; renderGenres(); save(); return; }
   if(ds.genre){
